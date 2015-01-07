@@ -1,4 +1,4 @@
-package davebot;
+package EBot;
 
 import battlecode.common.*;
 
