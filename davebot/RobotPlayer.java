@@ -1,219 +1,171 @@
-package davebot;
+package marksbot;
 
 import battlecode.common.*;
 import java.util.*;
 
 public class RobotPlayer {
-	static RobotController rc;
-	static Team myTeam;
-	static Team enemyTeam;
-	static int myRange;
-	static Random rand;
-	static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-	
-	public static void run(RobotController tomatojuice) {
-		rc = tomatojuice;
-        rand = new Random(rc.getID());
 
-		myRange = rc.getType().attackRadiusSquared;
-		MapLocation enemyLoc = rc.senseEnemyHQLocation();
-        Direction lastDirection = null;
-		myTeam = rc.getTeam();
-		enemyTeam = myTeam.opponent();
-		RobotInfo[] myRobots;
+	public static void run(RobotController rc) {
 
 		while(true) {
-            try {
-                rc.setIndicatorString(0, "This is an indicator string.");
-                rc.setIndicatorString(1, "I am a " + rc.getType());
-            } catch (Exception e) {
-                System.out.println("Unexpected exception");
-                e.printStackTrace();
-            }
-
-			if (rc.getType() == RobotType.HQ) {
-				try {
-					HQ.execute(rc);
-				} catch (Exception e) {
-					System.out.println("HQ Exception");
-                    e.printStackTrace();
-				}
-			}
-			
-            if (rc.getType() == RobotType.TOWER) {
-                try {					
-					if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-				} catch (Exception e) {
-					System.out.println("Tower Exception");
-                    e.printStackTrace();
-				}
-            }
-			
-			
-			if (rc.getType() == RobotType.BASHER) {
-                try {
-                    RobotInfo[] adjacentEnemies = rc.senseNearbyRobots(2, enemyTeam);
-
-                    // BASHERs attack automatically, so let's just move around mostly randomly
-					if (rc.isCoreReady()) {
-						int fate = rand.nextInt(1000);
-						if (fate < 800) {
-							tryMove(directions[rand.nextInt(8)]);
-						} else {
-							tryMove(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
-						}
-					}
-                } catch (Exception e) {
-					System.out.println("Basher Exception");
-					e.printStackTrace();
-                }
-            }
-			
-            if (rc.getType() == RobotType.SOLDIER) {
-                try {
-                    if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-					if (rc.isCoreReady()) {
-						int fate = rand.nextInt(1000);
-						if (fate < 800) {
-							tryMove(directions[rand.nextInt(8)]);
-						} else {
-							tryMove(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
-						}
-					}
-                } catch (Exception e) {
-					System.out.println("Soldier Exception");
-					e.printStackTrace();
-                }
-            }
-			
-			if (rc.getType() == RobotType.BEAVER) {
-				try {
-					if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-					if (rc.isCoreReady()) {
-						int fate = rand.nextInt(1000);
-						if (fate < 8 && rc.getTeamOre() >= 300) {
-							tryBuild(directions[rand.nextInt(8)],RobotType.BARRACKS);
-						} else if (fate < 600) {
-							rc.mine();
-						} else if (fate < 900) {
-							tryMove(directions[rand.nextInt(8)]);
-						} else {
-							tryMove(rc.senseHQLocation().directionTo(rc.getLocation()));
-						}
-					}
-				} catch (Exception e) {
-					System.out.println("Beaver Exception");
-                    e.printStackTrace();
-				}
+			try {
+				rc.setIndicatorString(0, "This is an indicator string.");
+				rc.setIndicatorString(1, "I am a " + rc.getType());
+			} catch (Exception e) {
+				System.out.println("Unexpected exception");
+				e.printStackTrace();
 			}
 
-            if (rc.getType() == RobotType.BARRACKS) {
-				try {
-					int fate = rand.nextInt(10000);
-					
-                    // get information broadcasted by the HQ
-					int numBeavers = rc.readBroadcast(0);
-					int numSoldiers = rc.readBroadcast(1);
-					int numBashers = rc.readBroadcast(2);
-					
-					if (rc.isCoreReady() && rc.getTeamOre() >= 60 && fate < Math.pow(1.2,15-numSoldiers-numBashers+numBeavers)*10000) {
-						if (rc.getTeamOre() > 80 && fate % 2 == 0) {
-							trySpawn(directions[rand.nextInt(8)],RobotType.BASHER);
-						} else {
-							trySpawn(directions[rand.nextInt(8)],RobotType.SOLDIER);
-						}
+			switch (rc.getType()) {
+				case RobotPlayer.AEROSPACELAB:
+					try {
+						AEROSPACE.execute();
+					} catch (Exception e) {
+						System.out.println("AEROSPACELAB Exception");
+						e.printStackTrace();
 					}
-				} catch (Exception e) {
-					System.out.println("Barracks Exception");
-                    e.printStackTrace();
-				}
+				case RobotPlayer.BARRACKS:
+					try {
+						BARRACKS.execute();
+					} catch (Exception e) {
+						System.out.println("BARRACKS Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.BASHER:
+					try {
+						BASHER.execute();
+					} catch (Exception e) {
+						System.out.println("BASHER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.BEAVER:
+					try {
+						BEAVER.execute();
+					} catch (Exception e) {
+						System.out.println("BEAVER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.COMMANDER:
+					try {
+						COMMANDER.execute();
+					} catch (Exception e) {
+						System.out.println("COMMANDER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.COMPUTER:
+					try {
+						COMPUTER.execute();
+					} catch (Exception e) {
+						System.out.println("COMPUTER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.DRONE:
+					try {
+						DRONE.execute();
+					} catch (Exception e) {
+						System.out.println("DRONE Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.HANDWASHSTATION:
+					try {
+						HANDWASHSTATION.execute();
+					} catch (Exception e) {
+						System.out.println("HANDWASHSTATION Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.HELIPAD:
+					try {
+						HELIPAD.execute();
+					} catch (Exception e) {
+						System.out.println("HELIPAD Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.HQ:
+					try {
+						HQ.execute();
+					} catch (Exception e) {
+						System.out.println("HQ Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.LAUNCHER:
+					try {
+						LAUNCHER.execute();
+					} catch (Exception e) {
+						System.out.println("LAUNCHER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.MINER:
+					try {
+						MINER.execute();
+					} catch (Exception e) {
+						System.out.println("MINER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.MINERFACTORY:
+					try {
+						MINERFACTORY.execute();
+					} catch (Exception e) {
+						System.out.println("MINERFACTORY Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.MISSILE:
+					try {
+						MISSILE.execute();
+					} catch (Exception e) {
+						System.out.println("MISSILE Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.SOLDIER:
+					try {
+						SOLDIER.execute();
+					} catch (Exception e) {
+						System.out.println("SOLDIER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.SUPPLYDEPOT:
+					try {
+						SUPPLYDEPOT.execute();
+					} catch (Exception e) {
+						System.out.println("SUPPLYDEPOT Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.TANK:
+					try {
+						TANK.execute();
+					} catch (Exception e) {
+						System.out.println("TANK Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.TANKFACTORY:
+					try {
+						TANKFACTORY.execute();
+					} catch (Exception e) {
+						System.out.println("TANKFACTORY Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.TECHNOLOGYINSTITUTE:
+					try {
+						TECHNOLOGYINSTITUTE.execute();
+					} catch (Exception e) {
+						System.out.println("TECHNOLOGYINSTITUTE Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.TOWER:
+					try {
+						TOWER.execute();
+					} catch (Exception e) {
+						System.out.println("TOWER Exception");
+						e.printStackTrace();
+					}
+				case RobotPlayer.TRAININGFIELD:
+					try {
+						TRAININGFIELD.execute();
+					} catch (Exception e) {
+						System.out.println("TRAININGFIELD Exception");
+						e.printStackTrace();
+					}
 			}
-			
 			rc.yield();
-		}
-	}
-	
-    // This method will attack an enemy in sight, if there is one
-	static void attackSomething() throws GameActionException {
-		RobotInfo[] enemies = rc.senseNearbyRobots(myRange, enemyTeam);
-		if (enemies.length > 0) {
-            for (enemy: enemies) {
-                if (rc.canAttackLocation(enemy.location)) {
-                    rc.attackLocation(enemy.location);
-                    break;
-                }
-            }
-		}
-	}
-	
-    // This method will attempt to move in Direction d (or as close to it as possible)
-	static void tryMove(Direction d) throws GameActionException {
-		int offsetIndex = 0;
-		int[] offsets = {0,1,-1,2,-2};
-		int dirint = directionToInt(d);
-		boolean blocked = false;
-		while (offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
-			offsetIndex++;
-		}
-		if (offsetIndex < 5) {
-			rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
-		}
-	}
-	
-    // This method will attempt to spawn in the given direction (or as close to it as possible)
-	static void trySpawn(Direction d, RobotType type) throws GameActionException {
-		int offsetIndex = 0;
-		int[] offsets = {0,1,-1,2,-2,3,-3,4};
-		int dirint = directionToInt(d);
-		boolean blocked = false;
-		while (offsetIndex < 8 && !rc.canSpawn(directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
-			offsetIndex++;
-		}
-		if (offsetIndex < 8) {
-			rc.spawn(directions[(dirint+offsets[offsetIndex]+8)%8], type);
-		}
-	}
-	
-    // This method will attempt to build in the given direction (or as close to it as possible)
-	static void tryBuild(Direction d, RobotType type) throws GameActionException {
-		int offsetIndex = 0;
-		int[] offsets = {0,1,-1,2,-2,3,-3,4};
-		int dirint = directionToInt(d);
-		boolean blocked = false;
-		while (offsetIndex < 8 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
-			offsetIndex++;
-		}
-		if (offsetIndex < 8) {
-			rc.build(directions[(dirint+offsets[offsetIndex]+8)%8], type);
-		}
-	}
-	
-	static int directionToInt(Direction d) {
-		switch(d) {
-			case NORTH:
-				return 0;
-			case NORTH_EAST:
-				return 1;
-			case EAST:
-				return 2;
-			case SOUTH_EAST:
-				return 3;
-			case SOUTH:
-				return 4;
-			case SOUTH_WEST:
-				return 5;
-			case WEST:
-				return 6;
-			case NORTH_WEST:
-				return 7;
-			default:
-				return -1;
 		}
 	}
 }
