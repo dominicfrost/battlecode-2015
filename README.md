@@ -1,1 +1,1 @@
-# Team O's private repository #
+# Team O's *private* repository #
