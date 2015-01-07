@@ -2,7 +2,7 @@ package davebot;
 
 import battlecode.common.*;
 
-public class MINEFACTORY {
+public class MINERFACTORY {
     public static void execute(RobotController rc) throws GameActionException {
 
     }
