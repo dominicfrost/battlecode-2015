@@ -32,37 +32,8 @@ public class RobotPlayer {
             }
 
 			if (rc.getType() == RobotType.HQ) {
-				try {					
-					int fate = rand.nextInt(10000);
-					myRobots = rc.senseNearbyRobots(999999, myTeam);
-					int numSoldiers = 0;
-					int numBashers = 0;
-					int numBeavers = 0;
-					int numBarracks = 0;
-					for (RobotInfo r : myRobots) {
-						RobotType type = r.type;
-						if (type == RobotType.SOLDIER) {
-							numSoldiers++;
-						} else if (type == RobotType.BASHER) {
-							numBashers++;
-						} else if (type == RobotType.BEAVER) {
-							numBeavers++;
-						} else if (type == RobotType.BARRACKS) {
-							numBarracks++;
-						}
-					}
-					rc.broadcast(0, numBeavers);
-					rc.broadcast(1, numSoldiers);
-					rc.broadcast(2, numBashers);
-					rc.broadcast(100, numBarracks);
-					
-					if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-
-					if (numBeavers < 6) {
-						trySpawn(directions[rand.nextInt(8)], RobotType.BEAVER);
-					}
+				try {
+					HQ.execute(rc);
 				} catch (Exception e) {
 					System.out.println("HQ Exception");
                     e.printStackTrace();
