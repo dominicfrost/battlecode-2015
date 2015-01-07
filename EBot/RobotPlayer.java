@@ -19,7 +19,7 @@ public class RobotPlayer {
 			switch (rc.getType()) {
 				case RobotPlayer.AEROSPACELAB:
 					try {
-						AEROSPACE.execute();
+						AEROSPACE.execute(rc);
 					} catch (Exception e) {
 						System.out.println("AEROSPACELAB Exception");
 						e.printStackTrace();
