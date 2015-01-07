@@ -1,4 +1,4 @@
-package marksbot;
+package davebot;
 
 import battlecode.common.*;
 import java.util.*;
@@ -15,11 +15,11 @@ public class RobotPlayer {
 				System.out.println("Unexpected exception");
 				e.printStackTrace();
 			}
-
-			switch (rc.getType()) {
+            RobotType rt = rc.getType();
+			switch (rt) {
 				case RobotType.AEROSPACELAB:
 					try {
-						AEROSPACE.execute();
+						AEROSPACELAB.execute(rc);
 					} catch (Exception e) {
 						System.out.println("AEROSPACELAB Exception");
 						e.printStackTrace();
@@ -27,7 +27,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.BARRACKS:
 					try {
-						BARRACKS.execute();
+						BARRACKS.execute(rc);
 					} catch (Exception e) {
 						System.out.println("BARRACKS Exception");
 						e.printStackTrace();
@@ -35,7 +35,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.BASHER:
 					try {
-						BASHER.execute();
+						BASHER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("BASHER Exception");
 						e.printStackTrace();
@@ -43,7 +43,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.BEAVER:
 					try {
-						BEAVER.execute();
+						BEAVER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("BEAVER Exception");
 						e.printStackTrace();
@@ -51,7 +51,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.COMMANDER:
 					try {
-						COMMANDER.execute();
+						COMMANDER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("COMMANDER Exception");
 						e.printStackTrace();
@@ -59,7 +59,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.COMPUTER:
 					try {
-						COMPUTER.execute();
+						COMPUTER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("COMPUTER Exception");
 						e.printStackTrace();
@@ -67,7 +67,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.DRONE:
 					try {
-						DRONE.execute();
+						DRONE.execute(rc);
 					} catch (Exception e) {
 						System.out.println("DRONE Exception");
 						e.printStackTrace();
@@ -75,7 +75,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.HANDWASHSTATION:
 					try {
-						HANDWASHSTATION.execute();
+						HANDWASHSTATION.execute(rc);
 					} catch (Exception e) {
 						System.out.println("HANDWASHSTATION Exception");
 						e.printStackTrace();
@@ -83,7 +83,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.HELIPAD:
 					try {
-						HELIPAD.execute();
+						HELIPAD.execute(rc);
 					} catch (Exception e) {
 						System.out.println("HELIPAD Exception");
 						e.printStackTrace();
@@ -91,7 +91,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.HQ:
 					try {
-						HQ.execute();
+						HQ.execute(rc);
 					} catch (Exception e) {
 						System.out.println("HQ Exception");
 						e.printStackTrace();
@@ -99,7 +99,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.LAUNCHER:
 					try {
-						LAUNCHER.execute();
+						LAUNCHER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("LAUNCHER Exception");
 						e.printStackTrace();
@@ -107,7 +107,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.MINER:
 					try {
-						MINER.execute();
+						MINER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("MINER Exception");
 						e.printStackTrace();
@@ -115,7 +115,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.MINERFACTORY:
 					try {
-						MINERFACTORY.execute();
+						MINERFACTORY.execute(rc);
 					} catch (Exception e) {
 						System.out.println("MINERFACTORY Exception");
 						e.printStackTrace();
@@ -123,7 +123,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.MISSILE:
 					try {
-						MISSILE.execute();
+						MISSILE.execute(rc);
 					} catch (Exception e) {
 						System.out.println("MISSILE Exception");
 						e.printStackTrace();
@@ -131,7 +131,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.SOLDIER:
 					try {
-						SOLDIER.execute();
+						SOLDIER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("SOLDIER Exception");
 						e.printStackTrace();
@@ -139,7 +139,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.SUPPLYDEPOT:
 					try {
-						SUPPLYDEPOT.execute();
+						SUPPLYDEPOT.execute(rc);
 					} catch (Exception e) {
 						System.out.println("SUPPLYDEPOT Exception");
 						e.printStackTrace();
@@ -147,7 +147,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.TANK:
 					try {
-						TANK.execute();
+						TANK.execute(rc);
 					} catch (Exception e) {
 						System.out.println("TANK Exception");
 						e.printStackTrace();
@@ -155,7 +155,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.TANKFACTORY:
 					try {
-						TANKFACTORY.execute();
+						TANKFACTORY.execute(rc);
 					} catch (Exception e) {
 						System.out.println("TANKFACTORY Exception");
 						e.printStackTrace();
@@ -163,7 +163,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.TECHNOLOGYINSTITUTE:
 					try {
-						TECHNOLOGYINSTITUTE.execute();
+						TECHNOLOGYINSTITUTE.execute(rc);
 					} catch (Exception e) {
 						System.out.println("TECHNOLOGYINSTITUTE Exception");
 						e.printStackTrace();
@@ -171,7 +171,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.TOWER:
 					try {
-						TOWER.execute();
+						TOWER.execute(rc);
 					} catch (Exception e) {
 						System.out.println("TOWER Exception");
 						e.printStackTrace();
@@ -179,7 +179,7 @@ public class RobotPlayer {
 					break;
 				case RobotType.TRAININGFIELD:
 					try {
-						TRAININGFIELD.execute();
+						TRAININGFIELD.execute(rc);
 					} catch (Exception e) {
 						System.out.println("TRAININGFIELD Exception");
 						e.printStackTrace();

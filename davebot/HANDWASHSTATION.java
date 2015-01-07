@@ -2,7 +2,7 @@ package davebot;
 
 import battlecode.common.*;
 
-public class HANDWASHINGSTATION {
+public class HANDWASHSTATION {
     public static void execute(RobotController rc) throws GameActionException {
 
     }
