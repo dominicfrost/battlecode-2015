@@ -17,7 +17,7 @@ public class RobotPlayer {
 			}
 
 			switch (rc.getType()) {
-				case RobotPlayer.AEROSPACELAB:
+				case RobotType.AEROSPACELAB:
 					try {
 						AEROSPACE.execute();
 					} catch (Exception e) {
@@ -25,7 +25,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.BARRACKS:
+				case RobotType.BARRACKS:
 					try {
 						BARRACKS.execute();
 					} catch (Exception e) {
@@ -33,7 +33,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.BASHER:
+				case RobotType.BASHER:
 					try {
 						BASHER.execute();
 					} catch (Exception e) {
@@ -41,7 +41,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.BEAVER:
+				case RobotType.BEAVER:
 					try {
 						BEAVER.execute();
 					} catch (Exception e) {
@@ -49,7 +49,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.COMMANDER:
+				case RobotType.COMMANDER:
 					try {
 						COMMANDER.execute();
 					} catch (Exception e) {
@@ -57,7 +57,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.COMPUTER:
+				case RobotType.COMPUTER:
 					try {
 						COMPUTER.execute();
 					} catch (Exception e) {
@@ -65,7 +65,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.DRONE:
+				case RobotType.DRONE:
 					try {
 						DRONE.execute();
 					} catch (Exception e) {
@@ -73,7 +73,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.HANDWASHSTATION:
+				case RobotType.HANDWASHSTATION:
 					try {
 						HANDWASHSTATION.execute();
 					} catch (Exception e) {
@@ -81,7 +81,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.HELIPAD:
+				case RobotType.HELIPAD:
 					try {
 						HELIPAD.execute();
 					} catch (Exception e) {
@@ -89,7 +89,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.HQ:
+				case RobotType.HQ:
 					try {
 						HQ.execute();
 					} catch (Exception e) {
@@ -97,7 +97,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.LAUNCHER:
+				case RobotType.LAUNCHER:
 					try {
 						LAUNCHER.execute();
 					} catch (Exception e) {
@@ -105,7 +105,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.MINER:
+				case RobotType.MINER:
 					try {
 						MINER.execute();
 					} catch (Exception e) {
@@ -113,7 +113,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.MINERFACTORY:
+				case RobotType.MINERFACTORY:
 					try {
 						MINERFACTORY.execute();
 					} catch (Exception e) {
@@ -121,7 +121,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.MISSILE:
+				case RobotType.MISSILE:
 					try {
 						MISSILE.execute();
 					} catch (Exception e) {
@@ -129,7 +129,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.SOLDIER:
+				case RobotType.SOLDIER:
 					try {
 						SOLDIER.execute();
 					} catch (Exception e) {
@@ -137,7 +137,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.SUPPLYDEPOT:
+				case RobotType.SUPPLYDEPOT:
 					try {
 						SUPPLYDEPOT.execute();
 					} catch (Exception e) {
@@ -145,7 +145,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.TANK:
+				case RobotType.TANK:
 					try {
 						TANK.execute();
 					} catch (Exception e) {
@@ -153,7 +153,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.TANKFACTORY:
+				case RobotType.TANKFACTORY:
 					try {
 						TANKFACTORY.execute();
 					} catch (Exception e) {
@@ -161,7 +161,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.TECHNOLOGYINSTITUTE:
+				case RobotType.TECHNOLOGYINSTITUTE:
 					try {
 						TECHNOLOGYINSTITUTE.execute();
 					} catch (Exception e) {
@@ -169,7 +169,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.TOWER:
+				case RobotType.TOWER:
 					try {
 						TOWER.execute();
 					} catch (Exception e) {
@@ -177,7 +177,7 @@ public class RobotPlayer {
 						e.printStackTrace();
 					}
 					break;
-				case RobotPlayer.TRAININGFIELD:
+				case RobotType.TRAININGFIELD:
 					try {
 						TRAININGFIELD.execute();
 					} catch (Exception e) {
