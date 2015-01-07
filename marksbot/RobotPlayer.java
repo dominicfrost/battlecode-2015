@@ -1,17 +1,19 @@
 package marksbot;
 
 import battlecode.common.*;
+
 import java.util.*;
 
 public class RobotPlayer {
 	static RobotController rc;
-	
+
 	static Team myTeam;
 	static Team enemyTeam;
-	
+
 	static int myRange;
 	static Random rand;
-	
+	static Direction facing;
+
 	static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 
 	public static void run(RobotController RC) {
@@ -19,6 +21,7 @@ public class RobotPlayer {
 		rand = new Random(rc.getID());
 
 		myRange = rc.getType().attackRadiusSquared;
+		facing = getRandomDirection();
 
 		MapLocation enemyLoc = rc.senseEnemyHQLocation();
 		Direction lastDirection = null;
@@ -42,19 +45,23 @@ public class RobotPlayer {
 				try {					
 					int fate = rand.nextInt(10000);
 					myRobots = rc.senseNearbyRobots(999999, myTeam);
-					
+
 					int numBarracks = 0;
 					int numSoldiers = 0;
 					int numBashers = 0;
-					
+
 					int numBeavers = 0;
 					int numMiners = 0;
 					int numMiningFactories = 0;
-					
-					
+
+					int numTanks = 0;
+					int numTankFactories = 0;
+
+					int numSupplyDepos = 0;
+
 					for (RobotInfo r : myRobots) {
 						switch(r.type){
-						
+
 						case BEAVER:
 							numBeavers++;
 							break;
@@ -64,7 +71,7 @@ public class RobotPlayer {
 						case MINERFACTORY:
 							numMiningFactories++;
 							break;
-						
+
 						case SOLDIER:
 							numSoldiers++;
 							break;
@@ -74,15 +81,30 @@ public class RobotPlayer {
 						case BARRACKS:
 							numBarracks++;
 							break;
+
+						case TANK:
+							numTanks++;
+							break;
+						case TANKFACTORY:
+							numTankFactories++;
+							break;
+
+
+						case SUPPLYDEPOT:
+							numSupplyDepos++;
+							break;
 						}
 					}
-					
+
 					rc.broadcast(0, numBeavers);
 					rc.broadcast(1, numMiners);
 					rc.broadcast(2, numMiningFactories);
 					rc.broadcast(3, numSoldiers);
 					rc.broadcast(4, numBashers);
 					rc.broadcast(5, numBarracks);
+					rc.broadcast(6, numTanks);
+					rc.broadcast(7,  numTankFactories);
+					rc.broadcast(8,  numSupplyDepos);
 
 					if (rc.isWeaponReady()) {
 						attackSomething();
@@ -145,22 +167,29 @@ public class RobotPlayer {
 					e.printStackTrace();
 				}
 				break;
-			
+
 			case BEAVER:
 				try {
 					if (rc.isWeaponReady()) {
 						attackSomething();
 					}
+
+					int numSupplyDepots = rc.readBroadcast(8);
+					int numBarracks = rc.readBroadcast(5);
+					int numTankFactories = rc.readBroadcast(7);
+					int numMinerFactories = rc.readBroadcast(2);
+
 					if (rc.isCoreReady()) {
-						int fate = rand.nextInt(1000);
-						if (fate < 8 && rc.getTeamOre() >= 300) {
+						if (rc.getTeamOre() >= 500 && numMinerFactories < 3) {
+							tryBuild(directions[rand.nextInt(8)],RobotType.MINERFACTORY);
+						} else if (rc.getTeamOre() >= 100 && numSupplyDepots < 5) {
+							tryBuild(directions[rand.nextInt(8)],RobotType.SUPPLYDEPOT);
+						} else if (rc.getTeamOre() >= 300 && numBarracks < 5) {
 							tryBuild(directions[rand.nextInt(8)],RobotType.BARRACKS);
-						} else if (fate < 600) {
-							rc.mine();
-						} else if (fate < 900) {
-							tryMove(directions[rand.nextInt(8)]);
+						} else if (rc.getTeamOre() >= 500 && numTankFactories < 2) {
+							tryBuild(directions[rand.nextInt(8)],RobotType.TANKFACTORY);
 						} else {
-							tryMove(rc.senseHQLocation().directionTo(rc.getLocation()));
+							mineAndMove();
 						}
 					}
 				} catch (Exception e) {
@@ -168,18 +197,29 @@ public class RobotPlayer {
 					e.printStackTrace();
 				}
 				break;
-				
+
 			case BARRACKS:
 				try {
-					int fate = rand.nextInt(10000);
-
 					// get information broadcasted by the HQ
 					int numBeavers = rc.readBroadcast(0);
-					int numSoldiers = rc.readBroadcast(1);
-					int numBashers = rc.readBroadcast(2);
+					int numMiners = rc.readBroadcast(1);
+					int numMinerFactories = rc.readBroadcast(2);
 
-					if (rc.isCoreReady() && rc.getTeamOre() >= 60 && fate < Math.pow(1.2,15-numSoldiers-numBashers+numBeavers)*10000) {
-						if (rc.getTeamOre() > 80 && fate % 2 == 0) {
+
+					int numSoldiers = rc.readBroadcast(3);
+					int numBashers = rc.readBroadcast(4);
+					int numBarracks = rc.readBroadcast(5);
+
+					int numTanks = rc.readBroadcast(6);
+
+					double soldierCap = 0.4;
+					double basherCap = 0.4;
+
+					double soldierProp = (numSoldiers / (numSoldiers + numBashers + numTanks));
+					double basherProp = (numBashers / (numSoldiers + numBashers + numTanks));
+
+					if (rc.isCoreReady() && rc.getTeamOre() >= 60) {
+						if (rc.getTeamOre() > 80 && basherProp < basherCap) {
 							trySpawn(directions[rand.nextInt(8)],RobotType.BASHER);
 						} else {
 							trySpawn(directions[rand.nextInt(8)],RobotType.SOLDIER);
@@ -268,4 +308,46 @@ public class RobotPlayer {
 			return -1;
 		}
 	}
+
+	private static void mineAndMove() throws GameActionException {
+		if(rc.senseOre(rc.getLocation()) > 1){
+			if (rc.canMine() == true){
+				rc.mine();
+			}
+		} else {
+			moveAround();
+		}
+	}
+	private static void moveAround() throws GameActionException {if(rand.nextDouble() < 0.05){
+		if (rand.nextDouble() < 0.5){
+			facing = facing.rotateLeft();
+		} else {
+			facing = facing.rotateRight();
+		}
+
+		MapLocation tileInFront = rc.getLocation().add(facing);
+
+		MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+		boolean tileInFrontSafe = true;
+		for(MapLocation m: enemyTowers){
+			if(m.distanceSquaredTo(tileInFront) <= RobotType.TOWER.attackRadiusSquared){
+				tileInFrontSafe = false;
+				break;
+			}
+		}
+
+		if(rc.senseTerrainTile(rc.getLocation().add(facing))!=TerrainTile.NORMAL || !tileInFrontSafe){
+			facing = facing.rotateLeft();
+		}
+
+		if (rc.canMove(facing)){
+			rc.move(facing);
+		}	
+	}
+	}
+
+	private static Direction getRandomDirection() {
+		return Direction.values()[(int)(rand.nextDouble()*8)];
+	}
+
 }
