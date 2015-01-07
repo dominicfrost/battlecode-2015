@@ -1,0 +1,1 @@
+# The 2015 champion battlecode team's *private* repository #
