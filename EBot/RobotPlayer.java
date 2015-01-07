@@ -1,4 +1,4 @@
-package examplefuncsplayer;
+package EBot;
 
 import battlecode.common.*;
 import java.util.*;

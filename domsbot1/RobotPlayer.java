@@ -1,4 +1,4 @@
-package examplefuncsplayer;
+package domsbot1;
 
 import battlecode.common.*;
 import java.util.*;

@@ -1,4 +1,4 @@
-package examplefuncsplayer;
+package marksbot;
 
 import battlecode.common.*;
 import java.util.*;
