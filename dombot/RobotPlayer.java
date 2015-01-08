@@ -4,8 +4,24 @@ import battlecode.common.*;
 import java.util.*;
 
 public class RobotPlayer {
+	static Team myTeam;
+	static Team enemyTeam;
+
+	static MapLocation enemyHQLocation;
+	static MapLocation myHQLocation;
+
+	static int myRange;
+	static Random rand;
 
 	public static void run(RobotController rc) {
+		myTeam = rc.getTeam();
+		enemyTeam = myTeam.opponent();
+
+		enemyHQLocation = rc.senseEnemyHQLocation();
+		myHQLocation = rc.senseHQLocation();
+
+		myRange = rc.getType().attackRadiusSquared;
+		rand = new Random(rc.getID());
 
 		while(true) {
 
