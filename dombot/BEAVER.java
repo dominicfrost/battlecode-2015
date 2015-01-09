@@ -15,11 +15,18 @@ public class BEAVER {
             int r = RobotPlayer.rand.nextInt(100);
 
             if (r > 60) {
-                targetDirection = myLocation.directionTo(RobotPlayer.enemyHQLocation);
+                Util.tryMove(rc, myLocation.directionTo(RobotPlayer.enemyHQLocation));
             } else if (r > 50) {
-                targetDirection = myLocation.directionTo(RobotPlayer.enemyHQLocation);
+                Util.tryMove(rc, myLocation.directionTo(RobotPlayer.enemyHQLocation).rotateRight());
+            } else if (r > 40) {
+                Util.tryMove(rc, myLocation.directionTo(RobotPlayer.enemyHQLocation).rotateRight().rotateRight());
+            } else if (r > 30) {
+                Util.tryMove(rc, myLocation.directionTo(RobotPlayer.enemyHQLocation).rotateLeft());
+            } else if (r > 20) {
+                Util.tryMove(rc, myLocation.directionTo(RobotPlayer.enemyHQLocation).rotateLeft().rotateLeft());
+            } else {
+                rc.mine();
             }
-            Util.tryMove(rc, myLocation.directionTo(RobotPlayer.enemyHQLocation));
         }
     }
 }
