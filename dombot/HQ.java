@@ -7,7 +7,8 @@ public class HQ {
 
     public static void execute(RobotController rcIn) throws GameActionException {
         rc = rcIn;
-        int[] numRobots = countAndBroadcastRobotTypes();
+        RobotInfo[] myRobots = rc.senseNearbyRobots(9999999, RobotPlayer.myTeam);
+        int[] numRobots = countAndBroadcastRobotTypes(myRobots);
 
         if (rc.isWeaponReady()) {
             Util.attackSomething(rc, RobotPlayer.myRange, RobotPlayer.enemyTeam);
@@ -20,8 +21,7 @@ public class HQ {
         }
     }
 
-    public static int[] countAndBroadcastRobotTypes() throws GameActionException {
-        RobotInfo[] myRobots = rc.senseNearbyRobots(9999999, RobotPlayer.myTeam);
+    public static int[] countAndBroadcastRobotTypes(RobotInfo[] myRobots) throws GameActionException {
         int[] typeCount = new int[21];
         for (RobotInfo r : myRobots) {
             RobotType rt = r.type;
@@ -40,6 +40,9 @@ public class HQ {
                     break;
                 case COMMANDER:
                     typeCount[RobotType.COMMANDER.ordinal()]++;
+                    if (r.supplyLevel < 2000 && RobotPlayer.myHQLocation.distanceSquaredTo(r.location) <= 15) {
+                        rc.transferSupplies((int)Math.min(rc.getSupplyLevel(), 10000), r.location);
+                    }
                     break;
                 case COMPUTER:
                     typeCount[RobotType.COMPUTER.ordinal()]++;
@@ -70,12 +73,18 @@ public class HQ {
                     break;
                 case SOLDIER:
                     typeCount[RobotType.SOLDIER.ordinal()]++;
+                    if (r.supplyLevel < 2000 && RobotPlayer.myHQLocation.distanceSquaredTo(r.location) <= 15) {
+                        rc.transferSupplies((int)Math.min(rc.getSupplyLevel(), 10000), r.location);
+                    }
                     break;
                 case SUPPLYDEPOT:
                     typeCount[RobotType.SUPPLYDEPOT.ordinal()]++;
                     break;
                 case TANK:
                     typeCount[RobotType.TANK.ordinal()]++;
+                    if (r.supplyLevel < 2000 && RobotPlayer.myHQLocation.distanceSquaredTo(r.location) <= 15) {
+                        rc.transferSupplies((int)Math.min(rc.getSupplyLevel(), 10000), r.location);
+                    }
                     break;
                 case TANKFACTORY:
                     typeCount[RobotType.TANKFACTORY.ordinal()]++;
