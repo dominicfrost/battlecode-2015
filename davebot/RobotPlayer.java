@@ -5,11 +5,16 @@ import java.util.*;
 
 public class RobotPlayer {
 
+    static Team myTeam
+    static Team enemyTeam
+
 	public static void run(RobotController rc) {
 
 		while(true) {
 
             RobotType rt = rc.getType();
+            myTeam = rc.getTeam();
+            enemyTeam = myTeam.opponent();
 
 			switch (rt) {
 				case AEROSPACELAB:
