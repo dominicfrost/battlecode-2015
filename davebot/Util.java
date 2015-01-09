@@ -1,4 +1,4 @@
-package globals;
+package davebot;
 
 import battlecode.common.*;
 import java.util.ArrayDeque;

@@ -1,5 +1,4 @@
 package dombot;
-import globals.*;
 
 import battlecode.common.*;
 

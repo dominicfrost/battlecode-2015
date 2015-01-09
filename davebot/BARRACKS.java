@@ -1,6 +1,4 @@
 package davebot;
-import globals.*;
-import globals.*;
 
 import battlecode.common.*;
 
