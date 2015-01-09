@@ -147,9 +147,6 @@ public class Util {
         while (true) {
             //get my location, if its the goal quit
             myLocation = rc.getLocation();
-            if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                System.out.println("my location" + myLocation.toString());
-            }
             if (myLocation.equals(goal)) {
                 return true;
             }
@@ -157,31 +154,18 @@ public class Util {
             //if we are here then we shold be moving on the mLine
             //if we aren't on the mLine we f'd up so quit out
             int myLocationIndex = mLine.indexOf(myLocation);
-            if (myLocationIndex == -1 ) {
-                System.out.println("BUG FAILURE: not on mLine when i should be");
-                return false;
-            }
 
             //get the next location on the mLine and try to move there
             nextLocation = mLine.get(myLocationIndex + 1);
-            if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                System.out.println("locations (mine, goal)  " + myLocation.toString() + " " + nextLocation.toString());
-            }
 
             nextLocationDir = myLocation.directionTo(nextLocation);
             if (rc.canMove(nextLocationDir)) {
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("Going to " + nextLocation.toString());
-                }
                 doMove(rc, nextLocationDir);
                 continue;
             } else {
                 //we could not move along the mLine, bug around the wall
                 //until we reach one of our loop conditons are met
                 MapLocation startingPoint = myLocation;
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("Puttin hand on wall, tried to go " + nextLocationDir.toString());
-                }
                 putHandOnWall(rc, nextLocationDir, mLine);
             }
 
@@ -198,41 +182,22 @@ public class Util {
             leftDir = leftDir.rotateLeft();
 
             if (rc.canMove(rightDir)) {
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("Move in the direction: " + rightDir.toString());
-                }
                 doMove(rc, rightDir);
                 followWall(rc, rightDir, true, mLine);
                 return;
             }
 
             if (rc.canMove(leftDir)) {
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("Move in the direction: " + leftDir.toString() + " from " + rc.getLocation());
-                }
                 doMove(rc, leftDir);
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("Moved, new location: " + rc.getLocation());
-                }
                 followWall(rc, leftDir, false, mLine);
                 return;
-            }
-
-            if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                System.out.println("couldnt get hand on wall trying again");
             }
         }
     }
 
     public static void followWall(RobotController rc, Direction myDir, boolean movedClockwise, ArrayList<MapLocation> mLine) throws GameActionException  {
         while(true) {
-            if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                System.out.println("checking if in mLine " + rc.getLocation().toString());
-            }
             if (mLine.contains(rc.getLocation())) {
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("Back on mLine, quiting out of followWall, " + rc.getLocation().toString());
-                }
                 return;
             }
 
@@ -240,9 +205,6 @@ public class Util {
             Direction backInwards = rotateInDir(myDir, movedClockwise);
             backInwards = rotateInDir(backInwards, movedClockwise);
             if (rc.canMove(backInwards)) {
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("backIn Move in the direction: " + backInwards.toString());
-                }
                 doMove(rc, backInwards);
                 myDir = backInwards;
                 continue;
@@ -250,9 +212,6 @@ public class Util {
 
             //if i can go strait do it
             if (rc.canMove(myDir)) {
-                if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                    System.out.println("strait Move in the direction: " + myDir.toString());
-                }
                 doMove(rc, myDir);
                 continue;
             }
@@ -261,9 +220,6 @@ public class Util {
             while (true) {
                 myDir = rotateInDir(myDir, !movedClockwise);
                 if (rc.canMove(myDir)) {
-                    if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-                        System.out.println("outwards Move in the direction: " + myDir.toString());
-                    }
                     doMove(rc, myDir);
                     break;
                 }
@@ -299,13 +255,6 @@ public class Util {
             mLine.add(previousLocation);
             dirToGoal = previousLocation.directionTo(goal);
             previousLocation = previousLocation.add(dirToGoal);
-        }
-        if (rc.getID() == 8866 && Clock.getRoundNum() < 500) {
-            System.out.print("mLine: ");
-            for (int i = 0; i < mLine.size(); i++) {
-                System.out.print(mLine.get(i).toString() + ", ");
-            }
-            System.out.println();
         }
 
         return mLine;
