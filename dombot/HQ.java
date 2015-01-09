@@ -34,9 +34,6 @@ public class HQ {
         }
     }
 
-    /*
-     * counts how many of each type of robot there are on the given team
-     */
     public static int[] countAndBroadcastRobotTypes() throws GameActionException {
         RobotInfo[] myRobots = rc.senseNearbyRobots(9999999, RobotPlayer.myTeam);
         int[] typeCount = new int[21];

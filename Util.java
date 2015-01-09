@@ -1,6 +1,7 @@
 package dombot;
 
 import battlecode.common.*;
+import java.util.ArrayDeque;
 
 public class Util {
     static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
@@ -63,5 +64,38 @@ public class Util {
             default:
                 return -1;
         }
+    }
+
+    public static boolean flee(RobotController rc, RobotInfo[] enemyRobots) {
+        ArrayDeque<MapLocation> enemieLocs = new ArrayDeque<MapLocation>();
+        for (RobotInfo robot: enemyRobots) {
+            if (robot.type.attackRadiusSquared <= robot.location.distanceSquaredTo(rc.getLocation())) {
+                enemieLocs.add(robot.location);
+            }
+        }
+        if (enemieLocs.size() > 0) {
+            int counterx = 0;
+            int countery = 0;
+            for (MapLocation oppLoc : enemieLocs) {
+                counterx += oppLoc.x;
+                countery += oppLoc.y;
+            }
+
+            MapLocation avg = new MapLocation(counterx / enemieLocs.size(), countery / enemieLocs.size());
+            Direction dirToGoal = rc.getLocation().directionTo(avg).opposite();
+            tryMove(rc, dirToGoal);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static int[] getRobotCount(RobotController rc) {
+        int[] robotCount = new int[21];
+        for (int i = 0; i < robotCount.length; i++) {
+            robotCount[i] = rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + i);
+        }
+
+        return robotCount;
     }
 }

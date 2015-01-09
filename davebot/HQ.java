@@ -51,7 +51,7 @@ public class HQ {
      */
     public static void spawnBeaver(RobotController rc, int[] allyTypeCount) {
         if (rc.getTeamOre() >= 100 && allyTypeCount[RobotType.BEAVER.ordinal()] < 5) {
-            utils.smartSpawn(rc, RobotType.BEAVER);
+            Utils.smartSpawn(rc, RobotType.BEAVER);
         }
     }
 

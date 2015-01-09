@@ -2,6 +2,7 @@ package davebot;
 
 import battlecode.common.*;
 import java.util.Dictionary;
+import globals.*;
 
 
 public class BEAVER {
@@ -10,7 +11,7 @@ public class BEAVER {
         if (rc.isCoreReady()) {
             RobotInfo[] enemyRobots = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
 
-            if (utils.flee(rc, enemyRobots)) {
+            if (globals.Utils.flee(rc, enemyRobots)) {
                 return;
             }
 //            if (build(rc, allyTypeCount)) {
