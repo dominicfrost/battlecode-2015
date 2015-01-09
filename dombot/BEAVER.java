@@ -40,17 +40,17 @@ public class BEAVER {
                     rc.checkDependencyProgress(RobotType.TANKFACTORY) != DependencyProgress.INPROGRESS &&
                     ore >= 500 && rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + RobotType.TANKFACTORY.ordinal()) < 1) {
                 Util.tryBuild(rc, Direction.NORTH, RobotType.TANKFACTORY);
-            } else if (r > 90 && rc.checkDependencyProgress(RobotType.SUPPLYDEPOT) != DependencyProgress.INPROGRESS &&
+            } else if (r > 95 && rc.checkDependencyProgress(RobotType.SUPPLYDEPOT) != DependencyProgress.INPROGRESS &&
                     ore >= 100 && rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + RobotType.SUPPLYDEPOT.ordinal()) < 10 &&
-                    rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + RobotType.TANKFACTORY.ordinal()) >= 1) {
+                    rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + RobotType.TANK.ordinal()) >= 3) {
                 Util.tryBuild(rc, Direction.NORTH, RobotType.SUPPLYDEPOT);
-            } else if (r > 85) {
+            } else if (r > 90) {
                 Util.tryMove(rc, myLocation.directionTo(RobotPlayer.myHQLocation));
-            } else if (r > 80) {
+            } else if (r > 85) {
                 Util.tryMove(rc, myLocation.directionTo(RobotPlayer.myHQLocation).rotateRight().rotateRight());
-            } else if (r > 75) {
+            } else if (r > 80) {
                 Util.tryMove(rc, myLocation.directionTo(RobotPlayer.myHQLocation).rotateLeft().rotateLeft());
-            } else if (r > 70) {
+            } else if (r > 75) {
                 Util.tryMove(rc, myLocation.directionTo(RobotPlayer.myHQLocation).opposite());
             } else {
                 rc.mine();
