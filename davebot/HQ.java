@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 public class HQ {
     public static RobotController rc;
+
     public static void execute(RobotController rc_in) throws GameActionException {
         rc = rc_in;
         RobotInfo[] myRobots = rc.senseNearbyRobots(999999, RobotPlayer.myTeam);
@@ -11,7 +12,7 @@ public class HQ {
         int[] allyTypeCount = countTypes(myRobots);
         if (rc.isCoreReady()) {
             if (!attack(rc, enemyRobots)) {
-                //spawnBeaver(rc, myRobots);
+                spawnBeaver(rc, allyTypeCount);
             }
         }
     }
