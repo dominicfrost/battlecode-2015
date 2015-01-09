@@ -1,9 +1,10 @@
 package globals;
 
 import battlecode.common.*;
+import java.util.ArrayDeque;
 
 public class Util {
-    static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+   public static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 
     // This method will attempt to move in Direction d (or as close to it as possible)
     public static void tryMove(RobotController rc, Direction d) throws GameActionException {
@@ -21,8 +22,8 @@ public class Util {
 
 
     // This method will attack an enemy in sight, if there is one
-    static void attackSomething(RobotController rc) throws GameActionException {
-        RobotInfo[] enemies = rc.senseNearbyRobots(RobotPlayer.myRange, RobotPlayer.enemyTeam);
+    public static void attackSomething(RobotController rc, int myRange, Team enemyTeam) throws GameActionException {
+        RobotInfo[] enemies = rc.senseNearbyRobots(myRange, enemyTeam);
         if (enemies.length > 0) {
             rc.attackLocation(enemies[0].location);
         }
@@ -65,8 +66,8 @@ public class Util {
         }
     }
 
-    public static boolean flee(RobotController rc, RobotInfo[] enemyRobots) {
-        ArrayList<MapLocation> enemieLocs = new ArrayList<MapLocation>();
+    public static boolean flee(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
+        ArrayDeque<MapLocation> enemieLocs = new ArrayDeque<MapLocation>();
         for (RobotInfo robot: enemyRobots) {
             if (robot.type.attackRadiusSquared <= robot.location.distanceSquaredTo(rc.getLocation())) {
                 enemieLocs.add(robot.location);
@@ -82,19 +83,33 @@ public class Util {
 
             MapLocation avg = new MapLocation(counterx / enemieLocs.size(), countery / enemieLocs.size());
             Direction dirToGoal = rc.getLocation().directionTo(avg).opposite();
-            Utils.smartMove(rc, dirToGoal);
+            tryMove(rc, dirToGoal);
             return true;
         }
 
         return false;
     }
 
-    public static int[] getRobotCount(RobotController rc) {
+    public static int[] getRobotCount(RobotController rc) throws GameActionException{
         int[] robotCount = new int[21];
         for (int i = 0; i < robotCount.length; i++) {
-            robotCount[i] = rc.readBroadcast(ROBOT_COUNT_OFFSET + i);
+            robotCount[i] = rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + i);
         }
 
         return robotCount;
+    }
+
+    // This method will attempt to spawn in the given direction (or as close to it as possible)
+    public static void trySpawn(RobotController rc, Direction d, RobotType type) throws GameActionException {
+        int offsetIndex = 0;
+        int[] offsets = {0,1,-1,2,-2,3,-3,4};
+        int dirint = Util.directionToInt(d);
+        boolean blocked = false;
+        while (offsetIndex < 8 && !rc.canSpawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
+            offsetIndex++;
+        }
+        if (offsetIndex < 8) {
+            rc.spawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type);
+        }
     }
 }

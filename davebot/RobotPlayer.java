@@ -1,4 +1,5 @@
 package davebot;
+import globals.*;
 
 import battlecode.common.*;
 import java.util.*;

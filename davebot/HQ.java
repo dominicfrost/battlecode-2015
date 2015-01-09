@@ -1,4 +1,5 @@
 package davebot;
+import globals.*;
 
 import battlecode.common.*;
 
@@ -20,7 +21,7 @@ public class HQ {
      * attacks the enemy that is the closeset
      * if two are equal distance away it attacks the weaker one
      */
-    public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) {
+    public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
         if (rc.isWeaponReady()) {
             MapLocation myLocation = rc.getLocation();
             RobotInfo toAttack = enemyRobots[0];
@@ -49,9 +50,9 @@ public class HQ {
     /*
      * Spawns some beaver
      */
-    public static void spawnBeaver(RobotController rc, int[] allyTypeCount) {
+    public static void spawnBeaver(RobotController rc, int[] allyTypeCount) throws GameActionException{
         if (rc.getTeamOre() >= 100 && allyTypeCount[RobotType.BEAVER.ordinal()] < 5) {
-            Utils.smartSpawn(rc, RobotType.BEAVER);
+            Util.trySpawn(rc, Direction.NORTH, RobotType.BEAVER);
         }
     }
 
@@ -130,7 +131,7 @@ public class HQ {
         }
 
         for (int i = 0; i < typeCount.length; i++) {
-            rc.brodcast(MyConstants.ROBOT_COUNT_OFFSET + i, typeCount[i]);
+            rc.broadcast(MyConstants.ROBOT_COUNT_OFFSET + i, typeCount[i]);
         }
 
         return typeCount;

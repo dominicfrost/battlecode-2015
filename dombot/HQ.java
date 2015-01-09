@@ -1,4 +1,5 @@
 package dombot;
+import globals.*;
 
 import battlecode.common.*;
 
@@ -10,27 +11,13 @@ public class HQ {
         int[] numRobots = countAndBroadcastRobotTypes();
 
         if (rc.isWeaponReady()) {
-            Util.attackSomething(rc);
+            Util.attackSomething(rc, RobotPlayer.myRange, RobotPlayer.enemyTeam);
         }
 
         if (rc.isCoreReady() && rc.getTeamOre() >= 100) {
-            if (numRobots[BEAVER.ordinal()] < 5) {
-                trySpawn(RobotPlayer.myHQLocation.directionTo(RobotPlayer.enemyHQLocation), RobotType.BEAVER);
+            if (numRobots[RobotType.BEAVER.ordinal()] < 5) {
+                Util.trySpawn(rc, RobotPlayer.myHQLocation.directionTo(RobotPlayer.enemyHQLocation), RobotType.BEAVER);
             }
-        }
-    }
-
-    // This method will attempt to spawn in the given direction (or as close to it as possible)
-    static void trySpawn(Direction d, RobotType type) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2,3,-3,4};
-        int dirint = Util.directionToInt(d);
-        boolean blocked = false;
-        while (offsetIndex < 8 && !rc.canSpawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
-            offsetIndex++;
-        }
-        if (offsetIndex < 8) {
-            rc.spawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type);
         }
     }
 
@@ -38,77 +25,78 @@ public class HQ {
         RobotInfo[] myRobots = rc.senseNearbyRobots(9999999, RobotPlayer.myTeam);
         int[] typeCount = new int[21];
         for (RobotInfo r : myRobots) {
-            switch (r.type) {
+            RobotType rt = r.type;
+            switch (rt) {
                 case AEROSPACELAB:
-                    typeCount[AEROSPACELAB.ordinal()]++;
+                    typeCount[RobotType.AEROSPACELAB.ordinal()]++;
                     break;
                 case BARRACKS:
-                    typeCount[BARRACKS.ordinal()]++;
+                    typeCount[RobotType.BARRACKS.ordinal()]++;
                     break;
                 case BASHER:
-                    typeCount[BASHER.ordinal()]++;
+                    typeCount[RobotType.BASHER.ordinal()]++;
                     break;
                 case BEAVER:
-                    typeCount[BEAVER.ordinal()]++;
+                    typeCount[RobotType.BEAVER.ordinal()]++;
                     break;
                 case COMMANDER:
-                    typeCount[COMMANDER.ordinal()]++;
+                    typeCount[RobotType.COMMANDER.ordinal()]++;
                     break;
                 case COMPUTER:
-                    typeCount[COMPUTER.ordinal()]++;
+                    typeCount[RobotType.COMPUTER.ordinal()]++;
                     break;
                 case DRONE:
-                    typeCount[DRONE.ordinal()]++;
+                    typeCount[RobotType.DRONE.ordinal()]++;
                     break;
                 case HANDWASHSTATION:
-                    typeCount[HANDWASHSTATION.ordinal()]++;
+                    typeCount[RobotType.HANDWASHSTATION.ordinal()]++;
                     break;
                 case HELIPAD:
-                    typeCount[HELIPAD.ordinal()]++;
+                    typeCount[RobotType.HELIPAD.ordinal()]++;
                     break;
                 case HQ:
-                    typeCount[HQ.ordinal()]++;
+                    typeCount[RobotType.HQ.ordinal()]++;
                     break;
                 case LAUNCHER:
-                    typeCount[LAUNCHER.ordinal()]++;
+                    typeCount[RobotType.LAUNCHER.ordinal()]++;
                     break;
                 case MINER:
-                    typeCount[MINER.ordinal()]++;
+                    typeCount[RobotType.MINER.ordinal()]++;
                     break;
                 case MINERFACTORY:
-                    typeCount[MINERFACTORY.ordinal()]++;
+                    typeCount[RobotType.MINERFACTORY.ordinal()]++;
                     break;
                 case MISSILE:
-                    typeCount[MISSILE.ordinal()]++;
+                    typeCount[RobotType.MISSILE.ordinal()]++;
                     break;
                 case SOLDIER:
-                    typeCount[SOLDIER.ordinal()]++;
+                    typeCount[RobotType.SOLDIER.ordinal()]++;
                     break;
                 case SUPPLYDEPOT:
-                    typeCount[SUPPLYDEPOT.ordinal()]++;
+                    typeCount[RobotType.SUPPLYDEPOT.ordinal()]++;
                     break;
                 case TANK:
-                    typeCount[TANK.ordinal()]++;
+                    typeCount[RobotType.TANK.ordinal()]++;
                     break;
                 case TANKFACTORY:
-                    typeCount[TANKFACTORY.ordinal()]++;
+                    typeCount[RobotType.TANKFACTORY.ordinal()]++;
                     break;
                 case TECHNOLOGYINSTITUTE:
-                    typeCount[TECHNOLOGYINSTITUTE.ordinal()]++;
+                    typeCount[RobotType.TECHNOLOGYINSTITUTE.ordinal()]++;
                     break;
                 case TOWER:
-                    typeCount[TOWER.ordinal()]++;
+                    typeCount[RobotType.TOWER.ordinal()]++;
                     break;
                 case TRAININGFIELD:
-                    typeCount[TRAININGFIELD.ordinal()]++;
+                    typeCount[RobotType.TRAININGFIELD.ordinal()]++;
                     break;
             }
         }
 
         for (int i = 0; i < typeCount.length; i++) {
-            rc.brodcast(MyConstants.ROBOT_COUNT_OFFSET + i, typeCount[i]);
+            rc.broadcast(MyConstants.ROBOT_COUNT_OFFSET + i, typeCount[i]);
         }
 
         return typeCount;
-    }
+        }
 }

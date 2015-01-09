@@ -1,13 +1,14 @@
- package dombot;
+package dombot;
 
 import battlecode.common.*;
+import globals.*;
 
 public class BEAVER {
     public static void execute(RobotController rc) throws GameActionException {
         MapLocation myLocation = rc.getLocation();
 
         if (rc.isWeaponReady()) {
-            Util.attackSomething(rc);
+            Util.attackSomething(rc, RobotPlayer.myRange, RobotPlayer.enemyTeam);
         }
 
         if (rc.isCoreReady()) {
