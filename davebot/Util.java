@@ -43,6 +43,29 @@ public class Util {
         }
     }
 
+    public static Direction intToDirection(int i) {
+        switch(i) {
+            case 0:
+                return Direction.NORTH;
+            case 1:
+                return Direction.NORTH_EAST;
+            case 2:
+                return Direction.EAST;
+            case 3:
+                return Direction.SOUTH_EAST;
+            case 4:
+                return Direction.SOUTH;
+            case 5:
+                return Direction.SOUTH_WEST;
+            case 6:
+                return Direction.WEST;
+            case 7:
+                return Direction.NORTH_WEST;
+            default:
+                return Direction.NORTH;
+        }
+    }
+
     public static int directionToInt(Direction d) {
         switch(d) {
             case NORTH:

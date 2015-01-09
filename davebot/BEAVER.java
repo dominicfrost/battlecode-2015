@@ -13,9 +13,10 @@ public class BEAVER {
             if (Util.flee(rc, enemyRobots)) {
                 return;
             }
-//            if (build(rc, allyTypeCount)) {
-//                return;
-//            }
+            int[] allyTypeCount = Util.getRobotCount(rc);
+            if (build(rc, allyTypeCount)) {
+                return;
+            }
             mine(rc);
         }
     }
@@ -58,6 +59,11 @@ public class BEAVER {
     }
 
     public static void mine(RobotController rc) throws GameActionException {
+        int fate = RobotPlayer.rand.nextInt(10);
+        if (fate < 9) {
+            Util.tryMove(rc, Util.intToDirection(fate));
+            return;
+        }
         rc.mine();
     }
 

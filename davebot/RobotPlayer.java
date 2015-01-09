@@ -7,10 +7,12 @@ public class RobotPlayer {
 
     static Team myTeam;
     static Team enemyTeam;
+    static Random rand;
 
 	public static void run(RobotController rc) {
         myTeam = rc.getTeam();
         enemyTeam = myTeam.opponent();
+        rand = new Random(rc.getID());
 
 		while(true) {
 
