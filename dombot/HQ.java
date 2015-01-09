@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 public class HQ {
     public static void execute(RobotController rc) throws GameActionException {
+
         if (rc.isWeaponReady()) {
             Util.attackSomething(rc);
         }

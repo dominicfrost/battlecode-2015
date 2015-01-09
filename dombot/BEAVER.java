@@ -11,6 +11,14 @@ public class BEAVER {
         }
 
         if (rc.isCoreReady()) {
+            Direction targetDirection;
+            int r = RobotPlayer.rand.nextInt(100);
+
+            if (r > 60) {
+                targetDirection = myLocation.directionTo(RobotPlayer.enemyHQLocation);
+            } else if (r > 50) {
+                targetDirection = myLocation.directionTo(RobotPlayer.enemyHQLocation);
+            }
             Util.tryMove(rc, myLocation.directionTo(RobotPlayer.enemyHQLocation));
         }
     }
