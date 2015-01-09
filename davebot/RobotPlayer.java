@@ -5,10 +5,12 @@ import java.util.*;
 
 public class RobotPlayer {
 
-    static Team myTeam
-    static Team enemyTeam
+    static Team myTeam;
+    static Team enemyTeam;
 
 	public static void run(RobotController rc) {
+        myTeam = rc.getTeam();
+        enemyTeam = myTeam.opponent();
 
 		while(true) {
 

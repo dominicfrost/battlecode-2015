@@ -8,14 +8,14 @@ public class BEAVER {
 
     public static void execute(RobotController rc) throws GameActionException {
         if (rc.isCoreReady()) {
-            RobotInfo[] enemyRobots = rc.senseNearbyRobots(24, enemyTeam);
+            RobotInfo[] enemyRobots = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
 
-            if (flee(rc, enemyRobots)) {
+            if (utils.flee(rc, enemyRobots)) {
                 return;
             }
-            if (build(rc, allyTypeCount)) {
-                return;
-            }
+//            if (build(rc, allyTypeCount)) {
+//                return;
+//            }
             mine(rc);
         }
     }
@@ -31,7 +31,7 @@ public class BEAVER {
      * technology instutue
      * training field
      */
-    public static boolean build(RobotController rc, int allyTypeCount) {
+    public static boolean build(RobotController rc, int[] allyTypeCount) throws GameActionException{
 
         if (allyTypeCount[RobotType.MINERFACTORY.ordinal()] < 1) {
             return tryBuild(rc, RobotType.MINERFACTORY);
@@ -54,13 +54,14 @@ public class BEAVER {
         if (allyTypeCount[RobotType.TRAININGFIELD.ordinal()] < 1) {
             return tryBuild(rc, RobotType.TRAININGFIELD);
         }
+        return false;
     }
 
-    public static void mine(RobotController rc) {
-        rc.mine()
+    public static void mine(RobotController rc) throws GameActionException {
+        rc.mine();
     }
 
-    public static boolean tryBuild(RobotController rc, RobotType type) {
+    public static boolean tryBuild(RobotController rc, RobotType type) throws GameActionException {
         double ore = rc.getTeamOre();
         if (ore >= type.oreCost) {
             findAndBuild(rc, type);
@@ -70,8 +71,8 @@ public class BEAVER {
         return false;
     }
 
-    public static void findAndBuild(RobotController rc, RobotType type) {
-        Direction[] dirs = Directions.values();
+    public static void findAndBuild(RobotController rc, RobotType type) throws GameActionException {
+        Direction[] dirs = Direction.values();
         for (Direction dir: dirs) {
             if (rc.canBuild(dir, type)) {
                 rc.build(dir, type);
