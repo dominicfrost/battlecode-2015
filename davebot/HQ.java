@@ -11,9 +11,10 @@ public class HQ {
         RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
         int[] allyTypeCount = countTypes(myRobots);
         if (rc.isCoreReady()) {
-            if (!attack(rc, enemyRobots)) {
-                spawnBeaver(rc, allyTypeCount);
-            }
+            spawnBeaver(rc, allyTypeCount);
+//            if (!attack(rc, enemyRobots)) {
+//                spawnBeaver(rc, allyTypeCount);
+//            }
         }
     }
 

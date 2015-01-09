@@ -7,23 +7,24 @@ import java.util.Dictionary;
 public class BEAVER {
 
     public static void execute(RobotController rc) throws GameActionException {
-        if (rc.isCoreReady()) {
-            RobotInfo[] enemyRobots = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
-
-            if (Util.flee(rc, enemyRobots)) {
-                return;
-            }
-            int[] allyTypeCount = Util.getRobotCount(rc);
-            if (build(rc, allyTypeCount)) {
-                return;
-            }
-            mine(rc);
-        }
+//        if (rc.isCoreReady()) {
+//            RobotInfo[] enemyRobots = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
+//
+//            if (Util.flee(rc, enemyRobots)) {
+//                return;
+//            }
+//            int[] allyTypeCount = Util.getRobotCount(rc);
+//            if (build(rc, allyTypeCount)) {
+//                return;
+//            }
+//            mine(rc);
+//        }
+        Util.straitBuggin(rc, RobotPlayer.enemyHq);
     }
 
 
 
-    /*
+    /*S
      * miner factory
      * 2 barracks
      * tank factory
