@@ -5,349 +5,324 @@ import battlecode.common.*;
 import java.util.*;
 
 public class RobotPlayer {
-	static RobotController rc;
-
-	static Team myTeam;
-	static Team enemyTeam;
-
-	static int myRange;
-	static Random rand;
-	static Direction facing;
-
-	static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-
-	public static void run(RobotController RC) {
-		rc = RC;
-		rand = new Random(rc.getID());
-
-		myRange = rc.getType().attackRadiusSquared;
-		facing = getRandomDirection();
-
-		MapLocation enemyLoc = rc.senseEnemyHQLocation();
-		Direction lastDirection = null;
-
-		myTeam = rc.getTeam();
-		enemyTeam = myTeam.opponent();
-
-		RobotInfo[] myRobots;
-
-		while(true) {
-			try {
-				rc.setIndicatorString(0, "This is an indicator string.");
-				rc.setIndicatorString(1, "I am a " + rc.getType());
-			} catch (Exception e) {
-				System.out.println("Unexpected exception");
-				e.printStackTrace();
-			}
-
-			switch(rc.getType()){
-			case HQ:
-				try {					
-					int fate = rand.nextInt(10000);
-					myRobots = rc.senseNearbyRobots(999999, myTeam);
-
-					int numBarracks = 0;
-					int numSoldiers = 0;
-					int numBashers = 0;
-
-					int numBeavers = 0;
-					int numMiners = 0;
-					int numMiningFactories = 0;
-
-					int numTanks = 0;
-					int numTankFactories = 0;
-
-					int numSupplyDepos = 0;
-
-					for (RobotInfo r : myRobots) {
-						switch(r.type){
-
-						case BEAVER:
-							numBeavers++;
-							break;
-						case MINER:
-							numMiners++;
-							break;
-						case MINERFACTORY:
-							numMiningFactories++;
-							break;
-
-						case SOLDIER:
-							numSoldiers++;
-							break;
-						case BASHER:
-							numBashers++;
-							break;
-						case BARRACKS:
-							numBarracks++;
-							break;
-
-						case TANK:
-							numTanks++;
-							break;
-						case TANKFACTORY:
-							numTankFactories++;
-							break;
-
-
-						case SUPPLYDEPOT:
-							numSupplyDepos++;
-							break;
-						}
-					}
-
-					rc.broadcast(0, numBeavers);
-					rc.broadcast(1, numMiners);
-					rc.broadcast(2, numMiningFactories);
-					rc.broadcast(3, numSoldiers);
-					rc.broadcast(4, numBashers);
-					rc.broadcast(5, numBarracks);
-					rc.broadcast(6, numTanks);
-					rc.broadcast(7,  numTankFactories);
-					rc.broadcast(8,  numSupplyDepos);
-
-					if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-
-					if (rc.isCoreReady() && rc.getTeamOre() >= 100 && numBeavers < 20) {
-						trySpawn(directions[rand.nextInt(8)], RobotType.BEAVER);
-					}
-				} catch (Exception e) {
-					System.out.println("HQ Exception");
+	public static void run(RobotController rc) {
+        BaseBot myself;
+        
+        switch(rc.getType()){
+        case HQ:
+        	for (int i = 0; i < 100; i ++){
+        		try {
+					rc.broadcast(i, 0);
+				} catch (GameActionException e) {
 					e.printStackTrace();
 				}
-				break;
+        	}
+        	myself = new HQ(rc);
+        	break;
+        case TOWER:
+        	myself = new Tower(rc);
+        	break;
+        	
+        
+        case BEAVER:
+        	myself = new Beaver(rc);
+        	break;
+        	
+        case BARRACKS:
+        	myself = new Barracks(rc);
+        	break;
+        	
+        case SOLDIER:
+        	myself = new Soldier(rc);
+        	break;
+        	
+        default:
+        	myself = new BaseBot(rc);
+        	break;
+        }
 
-			case TOWER:
-				try {					
-					if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-				} catch (Exception e) {
-					System.out.println("Tower Exception");
-					e.printStackTrace();
-				}
-				break;
-
-			case BASHER:
-				try {
-					RobotInfo[] adjacentEnemies = rc.senseNearbyRobots(2, enemyTeam);
-
-					// BASHERs attack automatically, so let's just move around mostly randomly
-					if (rc.isCoreReady()) {
-						int fate = rand.nextInt(1000);
-						if (fate < 800) {
-							tryMove(directions[rand.nextInt(8)]);
-						} else {
-							tryMove(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
-						}
-					}
-				} catch (Exception e) {
-					System.out.println("Basher Exception");
-					e.printStackTrace();
-				}
-				break;
-
-			case SOLDIER:
-				try {
-					if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-					if (rc.isCoreReady()) {
-						int fate = rand.nextInt(1000);
-						if (fate < 800) {
-							tryMove(directions[rand.nextInt(8)]);
-						} else {
-							tryMove(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
-						}
-					}
-				} catch (Exception e) {
-					System.out.println("Soldier Exception");
-					e.printStackTrace();
-				}
-				break;
-
-			case BEAVER:
-				try {
-					if (rc.isWeaponReady()) {
-						attackSomething();
-					}
-
-					int numSupplyDepots = rc.readBroadcast(8);
-					int numBarracks = rc.readBroadcast(5);
-					int numTankFactories = rc.readBroadcast(7);
-					int numMinerFactories = rc.readBroadcast(2);
-
-					if (rc.isCoreReady()) {
-						if (rc.getTeamOre() >= 500 && numMinerFactories < 3) {
-							tryBuild(directions[rand.nextInt(8)],RobotType.MINERFACTORY);
-						} else if (rc.getTeamOre() >= 100 && numSupplyDepots < 5) {
-							tryBuild(directions[rand.nextInt(8)],RobotType.SUPPLYDEPOT);
-						} else if (rc.getTeamOre() >= 300 && numBarracks < 5) {
-							tryBuild(directions[rand.nextInt(8)],RobotType.BARRACKS);
-						} else if (rc.getTeamOre() >= 500 && numTankFactories < 2) {
-							tryBuild(directions[rand.nextInt(8)],RobotType.TANKFACTORY);
-						} else {
-							mineAndMove();
-						}
-					}
-				} catch (Exception e) {
-					System.out.println("Beaver Exception");
-					e.printStackTrace();
-				}
-				break;
-
-			case BARRACKS:
-				try {
-					// get information broadcasted by the HQ
-					int numBeavers = rc.readBroadcast(0);
-					int numMiners = rc.readBroadcast(1);
-					int numMinerFactories = rc.readBroadcast(2);
-
-
-					int numSoldiers = rc.readBroadcast(3);
-					int numBashers = rc.readBroadcast(4);
-					int numBarracks = rc.readBroadcast(5);
-
-					int numTanks = rc.readBroadcast(6);
-
-					double soldierCap = 0.4;
-					double basherCap = 0.4;
-
-					double soldierProp = (numSoldiers / (numSoldiers + numBashers + numTanks));
-					double basherProp = (numBashers / (numSoldiers + numBashers + numTanks));
-
-					if (rc.isCoreReady() && rc.getTeamOre() >= 60) {
-						if (rc.getTeamOre() > 80 && basherProp < basherCap) {
-							trySpawn(directions[rand.nextInt(8)],RobotType.BASHER);
-						} else {
-							trySpawn(directions[rand.nextInt(8)],RobotType.SOLDIER);
-						}
-					}
-				} catch (Exception e) {
-					System.out.println("Barracks Exception");
-					e.printStackTrace();
-				}
-				break;
-			}
-
-			rc.yield();
-		}
+        while (true) {
+            try {
+                myself.go();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 	}
 
-	// This method will attack an enemy in sight, if there is one
-	static void attackSomething() throws GameActionException {
-		RobotInfo[] enemies = rc.senseNearbyRobots(myRange, enemyTeam);
-		if (enemies.length > 0) {
-			rc.attackLocation(enemies[0].location);
-		}
-	}
+    public static class BaseBot {
+        protected RobotController rc;
+        protected MapLocation myHQ, theirHQ;
+        protected Team myTeam, theirTeam;
 
-	// This method will attempt to move in Direction d (or as close to it as possible)
-	static void tryMove(Direction d) throws GameActionException {
-		int offsetIndex = 0;
-		int[] offsets = {0,1,-1,2,-2};
-		int dirint = directionToInt(d);
-		boolean blocked = false;
-		while (offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
-			offsetIndex++;
-		}
-		if (offsetIndex < 5) {
-			rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
-		}
-	}
+        public BaseBot(RobotController rc) {
+            this.rc = rc;
+            this.myHQ = rc.senseHQLocation();
+            this.theirHQ = rc.senseEnemyHQLocation();
+            this.myTeam = rc.getTeam();
+            this.theirTeam = this.myTeam.opponent();
+        }
 
-	// This method will attempt to spawn in the given direction (or as close to it as possible)
-	static void trySpawn(Direction d, RobotType type) throws GameActionException {
-		int offsetIndex = 0;
-		int[] offsets = {0,1,-1,2,-2,3,-3,4};
-		int dirint = directionToInt(d);
-		boolean blocked = false;
-		while (offsetIndex < 8 && !rc.canSpawn(directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
-			offsetIndex++;
-		}
-		if (offsetIndex < 8) {
-			rc.spawn(directions[(dirint+offsets[offsetIndex]+8)%8], type);
-		}
-	}
+        public Direction[] getDirectionsToward(MapLocation dest) {
+            Direction toDest = rc.getLocation().directionTo(dest);
+            Direction[] dirs = {toDest,
+		    		toDest.rotateLeft(), toDest.rotateRight(),
+				toDest.rotateLeft().rotateLeft(), toDest.rotateRight().rotateRight()};
 
-	// This method will attempt to build in the given direction (or as close to it as possible)
-	static void tryBuild(Direction d, RobotType type) throws GameActionException {
-		int offsetIndex = 0;
-		int[] offsets = {0,1,-1,2,-2,3,-3,4};
-		int dirint = directionToInt(d);
-		boolean blocked = false;
-		while (offsetIndex < 8 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
-			offsetIndex++;
-		}
-		if (offsetIndex < 8) {
-			rc.build(directions[(dirint+offsets[offsetIndex]+8)%8], type);
-		}
-	}
+            return dirs;
+        }
 
-	static int directionToInt(Direction d) {
-		switch(d) {
-		case NORTH:
-			return 0;
-		case NORTH_EAST:
-			return 1;
-		case EAST:
-			return 2;
-		case SOUTH_EAST:
-			return 3;
-		case SOUTH:
-			return 4;
-		case SOUTH_WEST:
-			return 5;
-		case WEST:
-			return 6;
-		case NORTH_WEST:
-			return 7;
-		default:
-			return -1;
-		}
-	}
+        public Direction getMoveDir(MapLocation dest) {
+            Direction[] dirs = getDirectionsToward(dest);
+            for (Direction d : dirs) {
+                if (rc.canMove(d)) {
+                    return d;
+                }
+            }
+            return null;
+        }
 
-	private static void mineAndMove() throws GameActionException {
-		if(rc.senseOre(rc.getLocation()) > 1){
-			if (rc.canMine() == true){
-				rc.mine();
-			}
-		} else {
-			moveAround();
-		}
-	}
-	private static void moveAround() throws GameActionException {if(rand.nextDouble() < 0.05){
-		if (rand.nextDouble() < 0.5){
-			facing = facing.rotateLeft();
-		} else {
-			facing = facing.rotateRight();
-		}
+        public Direction getSpawnDirection(RobotType type) {
+            Direction[] dirs = getDirectionsToward(this.theirHQ);
+            for (Direction d : dirs) {
+                if (rc.canSpawn(d, type)) {
+                    return d;
+                }
+            }
+            return null;
+        }
 
-		MapLocation tileInFront = rc.getLocation().add(facing);
+        public Direction getBuildDirection(RobotType type) {
+            Direction[] dirs = getDirectionsToward(this.theirHQ);
+            for (Direction d : dirs) {
+                if (rc.canBuild(d, type)) {
+                    return d;
+                }
+            }
+            return null;
+        }
 
-		MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-		boolean tileInFrontSafe = true;
-		for(MapLocation m: enemyTowers){
-			if(m.distanceSquaredTo(tileInFront) <= RobotType.TOWER.attackRadiusSquared){
-				tileInFrontSafe = false;
-				break;
-			}
-		}
+        public RobotInfo[] getAllies() {
+            RobotInfo[] allies = rc.senseNearbyRobots(Integer.MAX_VALUE, myTeam);
+            return allies;
+        }
 
-		if(rc.senseTerrainTile(rc.getLocation().add(facing))!=TerrainTile.NORMAL || !tileInFrontSafe){
-			facing = facing.rotateLeft();
-		}
+        public RobotInfo[] getEnemiesInAttackingRange() {
+            RobotInfo[] enemies = rc.senseNearbyRobots(RobotType.SOLDIER.attackRadiusSquared, theirTeam);
+            return enemies;
+        }
 
-		if (rc.canMove(facing)){
-			rc.move(facing);
-		}	
-	}
-	}
+        public void attackLeastHealthEnemy(RobotInfo[] enemies) throws GameActionException {
+            if (enemies.length == 0) {
+                return;
+            }
 
-	private static Direction getRandomDirection() {
-		return Direction.values()[(int)(rand.nextDouble()*8)];
-	}
+            double minEnergon = enemies[0].health;
+            MapLocation toAttack = null;
+            for (RobotInfo info : enemies) {
+                if (info.health < minEnergon) {
+                    toAttack = info.location;
+                    minEnergon = info.health;
+                }
+            }
 
+            rc.attackLocation(toAttack);
+        }
+        
+        public void focusTower(RobotInfo[] enemies) throws GameActionException {
+        	if (enemies.length == 0){
+        		return;
+        	}
+        	
+        	MapLocation toAttack = null;
+        	double minEnergon = enemies[0].health;
+        	
+        	
+        	for (RobotInfo info : enemies){
+        		if (info.type == RobotType.TOWER){
+        			toAttack = info.location;
+        			break;
+        		} else {
+        			if (info.health < minEnergon){
+        				minEnergon = info.health;
+        				toAttack = info.location;
+        			}
+        		}
+        	}
+        	rc.attackLocation(toAttack);
+        }
+
+        public void beginningOfTurn() throws GameActionException {
+            if (rc.senseEnemyHQLocation() != null) {
+                this.theirHQ = rc.senseEnemyHQLocation();
+            }
+        }
+
+        public void endOfTurn() {
+        }
+
+        public void go() throws GameActionException {
+            beginningOfTurn();
+            execute();
+            endOfTurn();
+        }
+
+        public void execute() throws GameActionException {
+            rc.yield();
+        }
+    }
+
+    public static class HQ extends BaseBot {
+        public HQ(RobotController rc) {
+            super(rc);
+        }
+        
+        public void beginningOfTurn() throws GameActionException{
+        	int numBeavers = 0;
+        	int numMinerFactories = 0;
+        	int numMiners = 0;
+        	int numBarracks = 0;
+        	int numSoldiers = 0;
+        	
+        	
+        	
+        	RobotInfo[] army = rc.senseNearbyRobots(100, myTeam);
+        	for (RobotInfo unit : army){
+        		switch(unit.type){
+        		case BEAVER:
+        			numBeavers++;
+        			break;
+        		case MINERFACTORY:
+        			numMinerFactories++;
+        			break;
+        		case MINER:
+        			numMiners++;
+        			break;
+        		case BARRACKS:
+        			numBarracks++;
+        			break;
+        		case SOLDIER:
+        			numSoldiers++;
+        			break;
+        		}
+        	}
+        	rc.broadcast(2, numBeavers);
+        	rc.broadcast(3,  numMinerFactories);
+        	rc.broadcast(4,  numMiners);
+        	rc.broadcast(5, numBarracks);
+        	rc.broadcast(6, numSoldiers);
+        }
+
+        public void execute() throws GameActionException {
+            int numBeavers = rc.readBroadcast(2);
+
+            if (rc.isCoreReady() && rc.getTeamOre() > 100 && numBeavers < 10) {
+                Direction newDir = getSpawnDirection(RobotType.BEAVER);
+                if (newDir != null) {
+                    rc.spawn(newDir, RobotType.BEAVER);
+                }
+            }
+            MapLocation rallyPoint;
+            if (Clock.getRoundNum() < 600) {
+                rallyPoint = new MapLocation( ((this.myHQ.x + this.theirHQ.x) / 3),
+                                              ((this.myHQ.y + this.theirHQ.y)) / 3);
+            }
+            else {
+                rallyPoint = this.theirHQ;
+            }
+            rc.broadcast(0, rallyPoint.x);
+            rc.broadcast(1, rallyPoint.y);
+
+            rc.yield();
+        }
+    }
+
+    public static class Beaver extends BaseBot {
+        public Beaver(RobotController rc) {
+            super(rc);
+        }
+
+        public void execute() throws GameActionException {
+            if (rc.isCoreReady()) {
+                if (rc.getTeamOre() < 500) {
+                    //mine
+                    if (rc.senseOre(rc.getLocation()) > 0) {
+                        rc.mine();
+                    }
+                    else {
+                        Direction newDir = getMoveDir(this.theirHQ);
+
+                        if (newDir != null) {
+                            rc.move(newDir);
+                        }
+                    }
+                }
+                else {
+                    //build barracks
+                    Direction newDir = getBuildDirection(RobotType.BARRACKS);
+                    if (newDir != null) {
+                        rc.build(newDir, RobotType.BARRACKS);
+                    }
+                }
+            }
+
+            rc.yield();
+        }
+    }
+
+    public static class Barracks extends BaseBot {
+        public Barracks(RobotController rc) {
+            super(rc);
+        }
+
+        public void execute() throws GameActionException {
+            if (rc.isCoreReady() && rc.getTeamOre() > 200) {
+                Direction newDir = getSpawnDirection(RobotType.SOLDIER);
+                if (newDir != null) {
+                    rc.spawn(newDir, RobotType.SOLDIER);
+                }
+            }
+
+            rc.yield();
+        }
+    }
+
+    public static class Soldier extends BaseBot {
+        public Soldier(RobotController rc) {
+            super(rc);
+        }
+
+        public void execute() throws GameActionException {
+            RobotInfo[] enemies = getEnemiesInAttackingRange();
+
+            if (enemies.length > 0) {
+                //attack!
+                if (rc.isWeaponReady()) {
+                    attackLeastHealthEnemy(enemies);
+                }
+            }
+            else if (rc.isCoreReady()) {
+                int rallyX = rc.readBroadcast(0);
+                int rallyY = rc.readBroadcast(1);
+                MapLocation rallyPoint = new MapLocation(rallyX, rallyY);
+
+                Direction newDir = getMoveDir(rallyPoint);
+
+                if (newDir != null) {
+                    rc.move(newDir);
+                }
+            }
+            rc.yield();
+        }
+    }
+
+    public static class Tower extends BaseBot {
+        public Tower(RobotController rc) {
+            super(rc);
+        }
+
+        public void execute() throws GameActionException {
+            rc.yield();
+        }
+    }
 }
