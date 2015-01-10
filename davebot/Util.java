@@ -12,10 +12,15 @@ public class Util {
      * spawns the current spawn type if possible
      */
     public static boolean buildWithPrecedence(RobotController rc, Direction d, RobotType[] canBuild) throws GameActionException{
+        if (!rc.isCoreReady()) {
+            return false;
+        }
+
         RobotType toBuild = getRobotTypeToSpawn(rc);
-        if (Arrays.binarySearch(canBuild, toBuild) != -1) {
+        if (Arrays.asList(canBuild).indexOf(toBuild) > -1) {
             double myOre = rc.getTeamOre();
             if (myOre >= toBuild.oreCost) {
+                //System.out.println("Building " + toBuild.toString());
                 tryBuild(rc, d, toBuild);
                 return true;
             }
@@ -28,10 +33,15 @@ public class Util {
      * spawns the current spawn type if possible
      */
     public static boolean spawnWithPrecedence(RobotController rc, Direction d, RobotType[] canSpawn) throws GameActionException{
+        if (!rc.isCoreReady()) {
+            return false;
+        }
+
         RobotType toSpawn = getRobotTypeToSpawn(rc);
-        if (Arrays.binarySearch(canSpawn, toSpawn) != -1) {
+        if (Arrays.asList(canSpawn).indexOf(toSpawn) > -1) {
             double myOre = rc.getTeamOre();
             if (myOre >= toSpawn.oreCost) {
+                //System.out.println("Spawning " + toSpawn.toString());
                 trySpawn(rc, d, toSpawn);
                 return true;
             }
@@ -317,18 +327,19 @@ public class Util {
     }
 
     public static void doMove(RobotController rc, Direction dir) throws GameActionException{
-        while (true) {
-            while (!rc.canMove(dir) && !rc.isCoreReady()) {
+//        while (true) {
+            while (!rc.canMove(dir) || !rc.isCoreReady()) {
                 rc.yield();
             }
-            RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
-            if (!attack(rc, enemyRobots)) {
-                rc.move(dir);
-                rc.yield();
-                return;
-            }
-            rc.yield();
-        }
+//            RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
+//            if (!attack(rc, enemyRobots)) {
+//                rc.move(dir);
+//                rc.yield();
+//                return;
+//            }
+//            rc.yield();
+            rc.move(dir);
+//        }
     }
 
     public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{

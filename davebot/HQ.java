@@ -13,43 +13,13 @@ public class HQ {
 
         assessTheSituation();
         if (rc.isCoreReady()) {
-            if (!attack(enemyRobots)) {
+            if (!Util.attack(rc, enemyRobots)) {
                 Util.spawnWithPrecedence(rc, Direction.NORTH, canSpawn);
             }
         }
         if (executeStartRound == Clock.getRoundNum()) {
             rc.yield();
         }
-    }
-
-    /*
-     * attacks the enemy that is the closeset
-     * if two are equal distance away it attacks the weaker one
-     */
-    public static boolean attack(RobotInfo[] enemyRobots) throws GameActionException{
-        if (rc.isWeaponReady()) {
-            MapLocation myLocation = rc.getLocation();
-            RobotInfo toAttack = enemyRobots[0];
-            int closest = Integer.MAX_VALUE;
-
-            for (RobotInfo enemy : enemyRobots) {
-                int distanceToEnemy = myLocation.distanceSquaredTo(enemy.location);
-                if (distanceToEnemy < closest) {
-                    closest = distanceToEnemy;
-                    toAttack = enemy;
-                } else if (distanceToEnemy == closest) {
-                    if (enemy.health < toAttack.health) {
-                        toAttack = enemy;
-                    }
-                }
-            }
-
-            if (rc.canAttackLocation(toAttack.location)) {
-                rc.attackLocation(toAttack.location);
-                return true;
-            }
-        }
-        return false;
     }
 
     /*
