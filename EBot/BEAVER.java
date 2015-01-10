@@ -111,7 +111,7 @@ private static Direction getRandomDirection() {
     	rand = (int)rand;
     	
     	if(rand == 0){
-	    	if ((rc.senseOre(rc.getLocation())>10) && rc.isCoreReady() && rc.canMine()){
+	    	if ((rc.senseOre(rc.getLocation())>=1) && rc.isCoreReady() && rc.canMine()){
 	    		rc.mine();
 	    		mineOrMove(rc);
 	    	}
