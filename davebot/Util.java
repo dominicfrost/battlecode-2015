@@ -1,10 +1,84 @@
 package davebot;
 
 import battlecode.common.*;
-import java.util.ArrayDeque;
+import java.util.*;
 
 public class Util {
-   public static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+    public static Random rand = new Random();
+    public static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+
+
+    /*
+     * spawns the current spawn type if possible
+     */
+    public static boolean buildWithPrecedence(RobotController rc, Direction d, RobotType[] canBuild) throws GameActionException{
+        if (!rc.isCoreReady()) {
+            return false;
+        }
+
+        RobotType toBuild = getRobotTypeToSpawn(rc);
+        if (Arrays.asList(canBuild).indexOf(toBuild) > -1) {
+            double myOre = rc.getTeamOre();
+            if (myOre >= toBuild.oreCost) {
+                //System.out.println("Building " + toBuild.toString());
+                tryBuild(rc, d, toBuild);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
+     * spawns the current spawn type if possible
+     */
+    public static boolean spawnWithPrecedence(RobotController rc, Direction d, RobotType[] canSpawn) throws GameActionException{
+        if (!rc.isCoreReady()) {
+            return false;
+        }
+
+        RobotType toSpawn = getRobotTypeToSpawn(rc);
+        if (Arrays.asList(canSpawn).indexOf(toSpawn) > -1) {
+            double myOre = rc.getTeamOre();
+            if (myOre >= toSpawn.oreCost) {
+                //System.out.println("Spawning " + toSpawn.toString());
+                trySpawn(rc, d, toSpawn);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static void generalAttack(RobotController rc) throws GameActionException{
+        MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
+        System.out.println("GOAL: " + goal.toString());
+        if (rc.isCoreReady()) {
+            if (rc.canAttackLocation(goal)) {
+                System.out.println("can attack goal!: " + goal.toString());
+                rc.attackLocation(goal);
+                return;
+            }
+            RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
+            if (!attack(rc, enemyRobots)) {
+                if (rc.getHealth() < 40) {
+                    System.out.println("my health or supply is too low, going to hq");
+                    tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
+                    return;
+                }
+                System.out.println("moving to goal!: " + goal.toString());
+                tryMove(rc, rc.getLocation().directionTo(goal));
+            }
+        }
+    }
+
+    public static int mapLocToInt(MapLocation m){
+        return (m.x*10000 + m.y);
+    }
+
+    public static MapLocation intToMapLoc(int i){
+        return new MapLocation(i/10000,i%10000);
+    }
 
     // This method will attempt to move in Direction d (or as close to it as possible)
     public static void tryMove(RobotController rc, Direction d) throws GameActionException {
@@ -19,7 +93,6 @@ public class Util {
             rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
         }
     }
-
 
     // This method will attack an enemy in sight, if there is one
     public static void attackSomething(RobotController rc, int myRange, Team enemyTeam) throws GameActionException {
@@ -40,6 +113,22 @@ public class Util {
         }
         if (offsetIndex < 8) {
             rc.build(directions[(dirint+offsets[offsetIndex]+8)%8], type);
+        }
+    }
+
+    // mine like a dummy
+    public static void mine(RobotController rc) throws GameActionException {
+        if (!rc.isCoreReady()) {
+            return;
+        }
+
+        MapLocation myLocation = rc.getLocation();
+        double oreCount = rc.senseOre(myLocation);
+        if (oreCount > 0) {
+            rc.mine();
+        }else {
+            int fate = rand.nextInt(8);
+            Util.tryMove(rc, Util.intToDirection(fate));
         }
     }
 
@@ -122,6 +211,11 @@ public class Util {
         return robotCount;
     }
 
+    public static RobotType getRobotTypeToSpawn(RobotController rc) throws GameActionException{
+        RobotType[] types = RobotType.values();
+        return types[rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET)];
+    }
+
     // This method will attempt to spawn in the given direction (or as close to it as possible)
     public static void trySpawn(RobotController rc, Direction d, RobotType type) throws GameActionException {
         int offsetIndex = 0;
@@ -134,5 +228,172 @@ public class Util {
         if (offsetIndex < 8) {
             rc.spawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type);
         }
+    }
+
+    public static boolean straitBuggin(RobotController rc, MapLocation goal) throws GameActionException {
+        ArrayList<MapLocation> mLine = calcMLine(rc, goal);
+        MapLocation myLocation;
+        MapLocation nextLocation;
+        Direction currentDir;
+        Direction nextLocationDir;
+
+        while (true) {
+            //get my location, if its the goal quit
+            myLocation = rc.getLocation();
+            if (myLocation.equals(goal)) {
+                return true;
+            }
+
+            //if we are here then we shold be moving on the mLine
+            //if we aren't on the mLine we f'd up so quit out
+            int myLocationIndex = mLine.indexOf(myLocation);
+            if (myLocationIndex == -1 ) {
+                System.out.println("BUG FAILURE: not on mLine when i should be");
+                return false;
+            }
+
+            //get the next location on the mLine and try to move there
+            nextLocation = mLine.get(myLocationIndex + 1);
+
+            nextLocationDir = myLocation.directionTo(nextLocation);
+            if (rc.canMove(nextLocationDir)) {
+                doMove(rc, nextLocationDir);
+                continue;
+            } else {
+                //we could not move along the mLine, bug around the wall
+                //until we reach one of our loop conditons are met
+                MapLocation startingPoint = myLocation;
+                putHandOnWall(rc, nextLocationDir, mLine);
+            }
+
+        }
+
+    }
+
+    public static void putHandOnWall(RobotController rc, Direction startDir, ArrayList<MapLocation> mLine) throws GameActionException  {
+        Direction rightDir = startDir;
+        Direction leftDir = startDir;
+
+        while (true) {
+            rightDir = rightDir.rotateRight();
+            leftDir = leftDir.rotateLeft();
+
+            if (rc.canMove(rightDir)) {
+                doMove(rc, rightDir);
+                followWall(rc, rightDir, true, mLine);
+                return;
+            }
+
+            if (rc.canMove(leftDir)) {
+                doMove(rc, leftDir);
+                followWall(rc, leftDir, false, mLine);
+                return;
+            }
+        }
+    }
+
+    public static void followWall(RobotController rc, Direction myDir, boolean movedClockwise, ArrayList<MapLocation> mLine) throws GameActionException  {
+        while(true) {
+            if (mLine.contains(rc.getLocation())) {
+                return;
+            }
+
+            //if i can go in towards the mline do it
+            Direction backInwards = rotateInDir(myDir, movedClockwise);
+            if (rc.canMove(backInwards)) {
+                if(mLine.contains(rc.getLocation().add(myDir))) {
+                    doMove(rc, myDir);
+                    return;
+                }
+                doMove(rc, backInwards);
+                myDir = rotateInDir(backInwards, movedClockwise);
+                continue;
+            }
+
+            //if i can go strait do it
+            if (rc.canMove(myDir)) {
+                doMove(rc, myDir);
+                continue;
+            }
+
+            //rotate outwards until you can move
+            int turns = 0;
+            while (true) {
+                turns++;
+                myDir = rotateInDir(myDir, !movedClockwise);
+                if (rc.canMove(myDir)) {
+                    doMove(rc, myDir);
+                    int completeTurn = turns % 2;
+                    if (completeTurn == 0) {
+                        myDir = rotateInDir(myDir, movedClockwise);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public static Direction rotateInDir(Direction startDir, boolean rotateLeft) {
+        if (rotateLeft) {
+            return startDir.rotateLeft();
+        } else {
+            return startDir.rotateRight();
+        }
+    }
+
+    public static void doMove(RobotController rc, Direction dir) throws GameActionException{
+//        while (true) {
+            while (!rc.canMove(dir) || !rc.isCoreReady()) {
+                rc.yield();
+            }
+//            RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
+//            if (!attack(rc, enemyRobots)) {
+//                rc.move(dir);
+//                rc.yield();
+//                return;
+//            }
+//            rc.yield();
+            rc.move(dir);
+//        }
+    }
+
+    public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
+        if (rc.isWeaponReady()) {
+            MapLocation myLocation = rc.getLocation();
+            RobotInfo toAttack = enemyRobots[0];
+            int closest = Integer.MAX_VALUE;
+
+            for (RobotInfo enemy : enemyRobots) {
+                int distanceToEnemy = myLocation.distanceSquaredTo(enemy.location);
+                if (distanceToEnemy < closest) {
+                    closest = distanceToEnemy;
+                    toAttack = enemy;
+                } else if (distanceToEnemy == closest) {
+                    if (enemy.health < toAttack.health) {
+                        toAttack = enemy;
+                    }
+                }
+            }
+
+            if (rc.canAttackLocation(toAttack.location)) {
+                rc.attackLocation(toAttack.location);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) {
+        Direction dirToGoal;
+        ArrayList<MapLocation> mLine = new ArrayList<MapLocation>();
+        MapLocation previousLocation = rc.getLocation();
+
+        while (!previousLocation.equals(goal)) {
+            mLine.add(previousLocation);
+            dirToGoal = previousLocation.directionTo(goal);
+            previousLocation = previousLocation.add(dirToGoal);
+        }
+
+        return mLine;
     }
 }

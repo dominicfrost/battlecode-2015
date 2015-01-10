@@ -1,33 +1,17 @@
-package davebot;
+package EBot;
 
 import battlecode.common.*;
+
 import java.util.*;
 
 public class RobotPlayer {
 
-    static Team myTeam;
-    static Team enemyTeam;
-    static Random rand;
-    static MapLocation enemyHq;
-    static MapLocation myHq;
-    static MapLocation[] enemyTowers;
-    static MapLocation[] myTowers;
-
 	public static void run(RobotController rc) {
-        myTeam = rc.getTeam();
-        enemyTeam = myTeam.opponent();
-        rand = new Random(rc.getID());
-        enemyHq = rc.senseEnemyHQLocation();
-        enemyTowers = rc.senseEnemyTowerLocations();
-        myHq = rc.senseEnemyHQLocation();
-        myTowers = rc.senseEnemyTowerLocations();
 
 		while(true) {
 
             RobotType rt = rc.getType();
-            myTeam = rc.getTeam();
-            enemyTeam = myTeam.opponent();
-
+            
 			switch (rt) {
 				case AEROSPACELAB:
 					try {

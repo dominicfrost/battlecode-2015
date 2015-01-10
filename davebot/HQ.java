@@ -4,55 +4,21 @@ import battlecode.common.*;
 
 public class HQ {
     public static RobotController rc;
-
+    public static RobotType[] canSpawn = {RobotType.BEAVER};
     public static void execute(RobotController rc_in) throws GameActionException {
         rc = rc_in;
+        int executeStartRound = Clock.getRoundNum();
         RobotInfo[] myRobots = rc.senseNearbyRobots(999999, RobotPlayer.myTeam);
         RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
-        int[] allyTypeCount = countTypes(myRobots);
+
+        assessTheSituation();
         if (rc.isCoreReady()) {
-            if (!attack(rc, enemyRobots)) {
-                spawnBeaver(rc, allyTypeCount);
+            if (!Util.attack(rc, enemyRobots)) {
+                Util.spawnWithPrecedence(rc, Direction.NORTH, canSpawn);
             }
         }
-    }
-
-    /*
-     * attacks the enemy that is the closeset
-     * if two are equal distance away it attacks the weaker one
-     */
-    public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
-        if (rc.isWeaponReady()) {
-            MapLocation myLocation = rc.getLocation();
-            RobotInfo toAttack = enemyRobots[0];
-            int closest = Integer.MAX_VALUE;
-
-            for (RobotInfo enemy : enemyRobots) {
-                int distanceToEnemy = myLocation.distanceSquaredTo(enemy.location);
-                if (distanceToEnemy < closest) {
-                    closest = distanceToEnemy;
-                    toAttack = enemy;
-                } else if (distanceToEnemy == closest) {
-                    if (enemy.health < toAttack.health) {
-                        toAttack = enemy;
-                    }
-                }
-            }
-
-            if (rc.canAttackLocation(toAttack.location)) {
-                rc.attackLocation(toAttack.location);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /*
-     * Spawns some beaver
-     */
-    public static void spawnBeaver(RobotController rc, int[] allyTypeCount) throws GameActionException{
-        if (rc.getTeamOre() >= 100 && allyTypeCount[RobotType.BEAVER.ordinal()] < 5) {
-            Util.trySpawn(rc, Direction.NORTH, RobotType.BEAVER);
+        if (executeStartRound == Clock.getRoundNum()) {
+            rc.yield();
         }
     }
 
@@ -63,6 +29,11 @@ public class HQ {
         int[] typeCount = new int[21];
         for (RobotInfo r : myRobots) {
             RobotType rt = r.type;
+
+            if (r.supplyLevel < 2000 && RobotPlayer.myHq.distanceSquaredTo(r.location) <= 15) {
+                rc.transferSupplies((int) Math.min(2000 - r.supplyLevel, rc.getSupplyLevel()), r.location);
+            }
+
             switch (rt) {
                 case AEROSPACELAB:
                     typeCount[RobotType.AEROSPACELAB.ordinal()]++;
@@ -135,5 +106,91 @@ public class HQ {
         }
 
         return typeCount;
+    }
+
+    public static void assessTheSituation() throws GameActionException{
+        RobotInfo[] myRobots = rc.senseNearbyRobots(999999, RobotPlayer.myTeam);
+        int[] allyTypeCount = countTypes(myRobots);
+        broadcastNextSpawnType(allyTypeCount);
+        broadcastNextAttackLocation();
+    }
+
+    public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
+        if (allyTypeCount[RobotType.BEAVER.ordinal()] < 5) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.BEAVER.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.MINERFACTORY.ordinal()] < 3) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINERFACTORY.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.MINER.ordinal()] < 10) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINER.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.BARRACKS.ordinal()] < 2) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.BARRACKS.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.SOLDIER.ordinal()] < 10) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.SOLDIER.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.MINER.ordinal()] < 20) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINER.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.TANKFACTORY.ordinal()] < 1) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANKFACTORY.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.TANK.ordinal()] < 5) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANK.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.HELIPAD.ordinal()] < 2) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.HELIPAD.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.DRONE.ordinal()] < 5) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.DRONE.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.TANK.ordinal()] < 10) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANK.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.DRONE.ordinal()] < 10) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.DRONE.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.MINERFACTORY.ordinal()] < 4) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINERFACTORY.ordinal());
+            return;
+        }
+        if (allyTypeCount[RobotType.MINER.ordinal()] < 30) {
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINER.ordinal());
+            return;
+        }
+        rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANK.ordinal());
+    }
+
+
+    public static void broadcastNextAttackLocation() throws GameActionException{
+        int closest_dist = Integer.MAX_VALUE;
+        int distance;
+        MapLocation closest = RobotPlayer.enemyHq;
+        MapLocation myLocation = rc.getLocation();
+
+        for(int i = 0; i < RobotPlayer.enemyTowers.length; i++) {
+            distance = myLocation.distanceSquaredTo(RobotPlayer.enemyTowers[i]);
+            if (distance < closest_dist) {
+                closest_dist = distance;
+                closest = RobotPlayer.enemyTowers[i];
+            }
+        }
+
+        rc.broadcast(MyConstants.ATTACK_LOCATION, closest.x);
+        rc.broadcast(MyConstants.ATTACK_LOCATION + 1, closest.y);
     }
 }
