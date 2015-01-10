@@ -1,6 +1,7 @@
 package EBot;
 
 import battlecode.common.*;
+
 import java.util.*;
 
 public class RobotPlayer {
@@ -10,7 +11,7 @@ public class RobotPlayer {
 		while(true) {
 
             RobotType rt = rc.getType();
-
+            
 			switch (rt) {
 				case AEROSPACELAB:
 					try {
