@@ -29,6 +29,11 @@ public class HQ {
         int[] typeCount = new int[21];
         for (RobotInfo r : myRobots) {
             RobotType rt = r.type;
+
+            if (r.supplyLevel < 2000 && RobotPlayer.myHq.distanceSquaredTo(r.location) <= 15) {
+                rc.transferSupplies((int) Math.min(2000 - r.supplyLevel, rc.getSupplyLevel()), r.location);
+            }
+
             switch (rt) {
                 case AEROSPACELAB:
                     typeCount[RobotType.AEROSPACELAB.ordinal()]++;
@@ -185,6 +190,7 @@ public class HQ {
             }
         }
 
-        rc.broadcast(MyConstants.ATTACK_LOCATION, Util.mapLocToInt(closest));
+        rc.broadcast(MyConstants.ATTACK_LOCATION, closest.x);
+        rc.broadcast(MyConstants.ATTACK_LOCATION + 1, closest.y);
     }
 }

@@ -51,24 +51,33 @@ public class Util {
     }
 
     public static void generalAttack(RobotController rc) throws GameActionException{
-        MapLocation goal = intToMapLoc(rc.readBroadcast(MyConstants.ATTACK_LOCATION));
+        MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
+        System.out.println("GOAL: " + goal.toString());
         if (rc.isCoreReady()) {
             if (rc.canAttackLocation(goal)) {
+                System.out.println("can attack goal!: " + goal.toString());
                 rc.attackLocation(goal);
+                return;
             }
             RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
-            if(!flee(rc, enemyRobots)) {
-                straitBuggin(rc, goal);
+            if (!attack(rc, enemyRobots)) {
+                if (rc.getHealth() < 40) {
+                    System.out.println("my health or supply is too low, going to hq");
+                    tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
+                    return;
+                }
+                System.out.println("moving to goal!: " + goal.toString());
+                tryMove(rc, rc.getLocation().directionTo(goal));
             }
         }
     }
 
     public static int mapLocToInt(MapLocation m){
-        return (m.x*100 + m.y);
+        return (m.x*10000 + m.y);
     }
 
     public static MapLocation intToMapLoc(int i){
-        return new MapLocation(i/100,i%100);
+        return new MapLocation(i/10000,i%10000);
     }
 
     // This method will attempt to move in Direction d (or as close to it as possible)
@@ -109,12 +118,18 @@ public class Util {
 
     // mine like a dummy
     public static void mine(RobotController rc) throws GameActionException {
-        int fate = rand.nextInt(10);
-        if (fate < 9) {
-            Util.tryMove(rc, Util.intToDirection(fate));
+        if (!rc.isCoreReady()) {
             return;
         }
-        rc.mine();
+
+        MapLocation myLocation = rc.getLocation();
+        double oreCount = rc.senseOre(myLocation);
+        if (oreCount > 0) {
+            rc.mine();
+        }else {
+            int fate = rand.nextInt(8);
+            Util.tryMove(rc, Util.intToDirection(fate));
+        }
     }
 
     public static Direction intToDirection(int i) {
