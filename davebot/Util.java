@@ -186,9 +186,6 @@ public class Util {
             leftDir = leftDir.rotateLeft();
 
             if (rc.canMove(rightDir)) {
-                if (rc.getID() == 33514 && Clock.getRoundNum() < 500) {
-                    System.out.println("Move in the direction: " + rightDir.toString());
-                }
                 doMove(rc, rightDir);
                 followWall(rc, rightDir, true, mLine);
                 return;
@@ -210,10 +207,6 @@ public class Util {
 
             //if i can go in towards the mline do it
             Direction backInwards = rotateInDir(myDir, movedClockwise);
-
-
-
-            //backInwards = rotateInDir(backInwards, movedClockwise);
             if (rc.canMove(backInwards)) {
                 if(mLine.contains(rc.getLocation().add(myDir))) {
                     doMove(rc, myDir);
