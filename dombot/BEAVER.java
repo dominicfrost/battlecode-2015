@@ -15,19 +15,8 @@ public class BEAVER {
             int r = RobotPlayer.rand.nextInt(100);
             double ore = rc.getTeamOre();
 
-            RobotInfo[] enemyRobots = rc.senseNearbyRobots(RobotPlayer.myRange, RobotPlayer.enemyTeam);
-            if (enemyRobots.length > 0) {
-                RobotInfo closestRobot = enemyRobots[0];
-                int closestDistance = Integer.MAX_VALUE;
-                for (RobotInfo robot : enemyRobots) {
-                    int newDistance = robot.location.distanceSquaredTo(myLocation);
-                    if (newDistance < closestDistance) {
-                        closestDistance = newDistance;
-                        closestRobot = robot;
-                    }
-                }
-            } else if (rc.checkDependencyProgress(RobotType.BARRACKS) != DependencyProgress.INPROGRESS &&
-                    ore >= 300 && rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + RobotType.BARRACKS.ordinal()) < 1) {
+            if (rc.checkDependencyProgress(RobotType.BARRACKS) != DependencyProgress.INPROGRESS &&
+                    ore >= 300 && rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + RobotType.BARRACKS.ordinal()) < 2) {
                 Util.tryBuild(rc, Direction.NORTH, RobotType.BARRACKS);
             } else if (rc.checkDependencyProgress(RobotType.TECHNOLOGYINSTITUTE) != DependencyProgress.INPROGRESS &&
                     ore >= 200 && rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + RobotType.TECHNOLOGYINSTITUTE.ordinal()) < 1) {
