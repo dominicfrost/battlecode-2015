@@ -5,86 +5,33 @@ import java.util.Dictionary;
 
 
 public class BEAVER {
+    public static RobotController rc;
+    public static RobotType[] canBuild = {RobotType.MINERFACTORY,
+                                          RobotType.BARRACKS,
+                                          RobotType.TANKFACTORY,
+                                          RobotType.HELIPAD,
+                                          RobotType.AEROSPACELAB,
+                                          RobotType.TECHNOLOGYINSTITUTE,
+                                          RobotType.TRAININGFIELD};
 
-    public static void execute(RobotController rc) throws GameActionException {
-//        if (rc.isCoreReady()) {
-//            RobotInfo[] enemyRobots = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
-//
-//            if (Util.flee(rc, enemyRobots)) {
-//                return;
-//            }
-//            int[] allyTypeCount = Util.getRobotCount(rc);
-//            if (build(rc, allyTypeCount)) {
-//                return;
-//            }
-//            mine(rc);
-//        }
-        Util.straitBuggin(rc, RobotPlayer.enemyHq);
-    }
+    public static void execute(RobotController rc_in) throws GameActionException {
+        rc = rc_in;
+        int executeStartRound = Clock.getRoundNum();
+        if (rc.isCoreReady()) {
+            RobotInfo[] enemyRobots = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
 
-
-
-    /*S
-     * miner factory
-     * 2 barracks
-     * tank factory
-     * helipad
-     * aerospace lab
-     * technology instutue
-     * training field
-     */
-    public static boolean build(RobotController rc, int[] allyTypeCount) throws GameActionException{
-
-        if (allyTypeCount[RobotType.MINERFACTORY.ordinal()] < 1) {
-            return tryBuild(rc, RobotType.MINERFACTORY);
-        }
-        if (allyTypeCount[RobotType.BARRACKS.ordinal()] < 2) {
-            return tryBuild(rc, RobotType.BARRACKS);
-        }
-        if (allyTypeCount[RobotType.TANKFACTORY.ordinal()] < 1) {
-            return tryBuild(rc, RobotType.TANKFACTORY);
-        }
-        if (allyTypeCount[RobotType.HELIPAD.ordinal()] < 1) {
-            return tryBuild(rc, RobotType.HELIPAD);
-        }
-        if (allyTypeCount[RobotType.AEROSPACELAB.ordinal()] < 1) {
-            return tryBuild(rc, RobotType.AEROSPACELAB);
-        }
-        if (allyTypeCount[RobotType.TECHNOLOGYINSTITUTE.ordinal()] < 1) {
-            return tryBuild(rc, RobotType.TECHNOLOGYINSTITUTE);
-        }
-        if (allyTypeCount[RobotType.TRAININGFIELD.ordinal()] < 1) {
-            return tryBuild(rc, RobotType.TRAININGFIELD);
-        }
-        return false;
-    }
-
-    public static void mine(RobotController rc) throws GameActionException {
-        int fate = RobotPlayer.rand.nextInt(10);
-        if (fate < 9) {
-            Util.tryMove(rc, Util.intToDirection(fate));
-            return;
-        }
-        rc.mine();
-    }
-
-    public static boolean tryBuild(RobotController rc, RobotType type) throws GameActionException {
-        double ore = rc.getTeamOre();
-        if (ore >= type.oreCost) {
-            findAndBuild(rc, type);
-            return true;
-        }
-
-        return false;
-    }
-
-    public static void findAndBuild(RobotController rc, RobotType type) throws GameActionException {
-        Direction[] dirs = Direction.values();
-        for (Direction dir: dirs) {
-            if (rc.canBuild(dir, type)) {
-                rc.build(dir, type);
+            if (Util.flee(rc, enemyRobots)) {
+                rc.yield();
                 return;
             }
+            if (Util.buildWithPrecedence(rc, Direction.NORTH, canBuild)) {
+                rc.yield();
+                return;
+            }
+            Util.mine(rc);
+        }
+        if (executeStartRound == Clock.getRoundNum()) {
+            rc.yield();
         }
     }
 }

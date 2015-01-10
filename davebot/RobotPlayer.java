@@ -9,13 +9,18 @@ public class RobotPlayer {
     static Team enemyTeam;
     static Random rand;
     static MapLocation enemyHq;
+    static MapLocation myHq;
+    static MapLocation[] enemyTowers;
+    static MapLocation[] myTowers;
 
 	public static void run(RobotController rc) {
         myTeam = rc.getTeam();
         enemyTeam = myTeam.opponent();
         rand = new Random(rc.getID());
         enemyHq = rc.senseEnemyHQLocation();
-
+        enemyTowers = rc.senseEnemyTowerLocations();
+        myHq = rc.senseEnemyHQLocation();
+        myTowers = rc.senseEnemyTowerLocations();
 
 		while(true) {
 
@@ -52,8 +57,8 @@ public class RobotPlayer {
 					try {
 						BEAVER.execute(rc);
 					} catch (Exception e) {
-						//System.out.println("BEAVER Exception");
-						//e.printStackTrace();
+						System.out.println("BEAVER Exception");
+						e.printStackTrace();
 					}
 					break;
 				case COMMANDER:
