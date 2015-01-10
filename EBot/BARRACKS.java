@@ -10,7 +10,7 @@ public class BARRACKS {
 	
 	
     public static void execute(RobotController rc) throws GameActionException {
-    	if(Clock.getRoundNum()<700)
+    	if(Clock.getRoundNum()<400)
 			rc.yield();
     	else if(Clock.getRoundNum()<900)
     		spawnUnit(rc, RobotType.SOLDIER);
