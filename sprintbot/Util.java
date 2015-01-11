@@ -240,7 +240,7 @@ public class Util {
             case NORTH_WEST:
                 return 7;
             default:
-                return -1;
+                return 0;
         }
     }
 

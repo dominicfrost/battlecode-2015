@@ -115,7 +115,7 @@ public class HQ {
         broadcastNextSpawnType(allyTypeCount);
         broadcastNextAttackLocation();
     }
-    
+
     // this function broadcasts the number to spawn of a given type if we have less of that robot type than numDesired
     /*
      * allyTypeCount: an array containing how many of each robot type we have
@@ -140,42 +140,27 @@ public class HQ {
 
     //set the spawning precedence here
     public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
-        if (allyTypeCount[RobotType.BEAVER.ordinal()] < 10) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.BEAVER.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.MINERFACTORY.ordinal()] < 2) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINERFACTORY.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.MINER.ordinal()] < 20) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINER.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.BARRACKS.ordinal()] < 1) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.BARRACKS.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.SOLDIER.ordinal()] < 5) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.SOLDIER.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.HELIPAD.ordinal()] < 1) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.HELIPAD.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.DRONE.ordinal()] < 5) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.DRONE.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.TANKFACTORY.ordinal()] < 1) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANKFACTORY.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.TANK.ordinal()] < 5) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANK.ordinal());
-            return;
-        }
+        double remainingOre = rc.getTeamOre();
+        remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, 1);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.BARRACKS, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANKFACTORY, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 5, remainingOre, 1);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANK, 5, remainingOre, 1);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANKFACTORY, 3, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 3, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANK, 25, remainingOre, 3);
+        if (remainingOre < 0) return;
     }
 
 
