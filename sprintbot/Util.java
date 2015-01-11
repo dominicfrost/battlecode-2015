@@ -119,6 +119,53 @@ public class Util {
             rc.build(directions[(dirint+offsets[offsetIndex]+8)%8], type);
         }
     }
+    
+    //use this to return the map location in a specific direction from your robot
+    public static MapLocation getAdjacentLocation(RobotController rc, Direction dir, MapLocation loc){
+    	return (loc.add(dir));
+    }
+    
+    //mine while preferring areas w/ greater ore, but stay within 1/2 distance to enemy hq
+    public static void SmartMine(RobotController rc) throws GameActionException {
+        if (!rc.isCoreReady()) {
+            return;
+        }
+
+        MapLocation myLocation = rc.getLocation();
+        double oreCount = rc.senseOre(myLocation);
+        
+        double ore_N = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH, myLocation));
+        double ore_NE = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_EAST, myLocation));
+        double ore_E = rc.senseOre(getAdjacentLocation(rc, Direction.EAST, myLocation));
+        double ore_SE = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH_EAST, myLocation));
+        double ore_S = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH, myLocation));
+        double ore_SW = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH_WEST, myLocation));
+        double ore_W = rc.senseOre(getAdjacentLocation(rc, Direction.WEST, myLocation));
+        double ore_NW = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_WEST, myLocation));
+        
+        if(oreCount < ore_N)
+        	tryMove(rc, Direction.NORTH);
+        else if(oreCount < ore_NE)
+        	tryMove(rc, Direction.NORTH_EAST);
+        else if(oreCount < ore_E)
+        	tryMove(rc, Direction.EAST);
+        else if(oreCount < ore_SE)
+        	tryMove(rc, Direction.SOUTH_EAST);
+        else if(oreCount < ore_S)
+        	tryMove(rc, Direction.SOUTH);
+        else if(oreCount < ore_SW)
+        	tryMove(rc, Direction.SOUTH_WEST);
+        else if(oreCount < ore_W)
+        	tryMove(rc, Direction.WEST);
+        else if(oreCount < ore_NW)
+        	tryMove(rc, Direction.NORTH_WEST);
+        else if(oreCount > 0) {
+            rc.mine();
+        }else {
+            int fate = rand.nextInt(8);
+            Util.tryMove(rc, Util.intToDirection(fate));
+        }
+    }
 
     // mine like a dummy
     public static void mine(RobotController rc) throws GameActionException {
