@@ -12,6 +12,7 @@ public class RobotPlayer {
     static MapLocation myHq;
     static MapLocation[] enemyTowers;
     static MapLocation[] myTowers;
+    static MapLocatino[] avoid;
 
 	public static void run(RobotController rc) {
         myTeam = rc.getTeam();
