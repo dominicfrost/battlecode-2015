@@ -1,9 +1,10 @@
 package sprintbot;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import battlecode.common.*;
 
-static class Pathing {
+public class Pathing {
 
     static Direction allDirections[] = Direction.values();
 
@@ -140,115 +141,115 @@ static class Pathing {
     // ----- We need to figure out if this is even useful, we can't sense the whole map this year... ----
 
     // returns 2d aray of integers representing directions that lead to a given goal following the shortest possible path
-    public static int[][] assessMapWithDirection(RobotController rc, MapLocation goal, int[][] map) throws GameActionException {
-        ArrayDeque<MapLocation> queue = new ArrayDeque<MapLocation>();
-        ArrayDeque<MapLocation> enemyQueue = new ArrayDeque<MapLocation>();
-        int mapWidth = map.length;
-        int mapHeight = map[0].length;
-        int currentX;
-        int currentY;
-
-        MapLocation currentLocation;
-        map[goal.x][goal.y] = 9;
-
-        // cant move through HQ's, set their tiles to void
-        MapLocation temp = rc.senseHQLocation();
-        map[temp.x][temp.y] = 9;
-        MapLocation enemyHq = rc.senseEnemyHQLocation();
-        map[enemyHq.x][enemyHq.y] = 9;
-
-        // we dont want to path within range of the enemy hq, set all tiles within range to void.
-        enemyQueue.add(enemyHq);
-        while(!enemyQueue.isEmpty()){
-            currentLocation = enemyQueue.poll();
-            currentX = currentLocation.x;
-            currentY = currentLocation.y;
-
-            for(Direction dir : allDirections){
-                temp = currentLocation.add(dir);
-                if(temp.x != -1 && temp.y != -1 && temp.x < mapWidth && temp.y < mapHeight){
-                    if(map[temp.x][temp.y] != 9 && enemyHq.distanceSquaredTo(temp) < 35){
-                        map[temp.x][temp.y] = 9;
-                        enemyQueue.add(temp);
-                    }
-                }
-            }
-        }
-
-        // we dont want to path within range of any enemy towers. set all tiles within range to void.
-        MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-        for (MapLocation tower: enemyTowers) {
-            enemyQueue.add(tower);
-            while (!enemyQueue.isEmpty()) {
-                currentLocation = enemyQueue.poll();
-                currentX = currentLocation.x;
-                currentY = currentLocation.y;
-
-                for (Direction dir : allDirections) {
-                    temp = currentLocation.add(dir);
-                    if (temp.x != -1 && temp.y != -1 && temp.x < mapWidth && temp.y < mapHeight) {
-                        if (map[temp.x][temp.y] != 9 && enemyHq.distanceSquaredTo(temp) < 24) {
-                            map[temp.x][temp.y] = 9;
-                            enemyQueue.add(temp);
-                        }
-                    }
-                }
-            }
-        }
-
-        // we want map locations in the queue
-        queue.add(goal);
-        while(!queue.isEmpty()) {
-
-            currentLocation = queue.poll();
-            currentX = currentLocation.x;
-            currentY = currentLocation.y;
-
-            // check the northern square
-            if(currentY != 0 && map[currentX][currentY-1] == 0 && rc.senseTerrainTile(new MapLocation(currentX, currentY-1)).ordinal() != 2) {
-                map[currentX][currentY-1] = 5;
-                queue.add(new MapLocation(currentX, currentY-1));
-
-            }
-            // check the north eastern square
-            if(currentY != 0 && currentX != mapWidth-1 && map[currentX+1][currentY-1] == 0 && rc.senseTerrainTile(new MapLocation(currentX+1, currentY-1)).ordinal() != 2) {
-                map[currentX+1][currentY-1] = 6;
-                queue.add(new MapLocation(currentX+1, currentY-1));
-
-            }
-            // check the eastern square
-            if(currentX != mapWidth-1 && map[currentX+1][currentY] == 0 && rc.senseTerrainTile(new MapLocation(currentX+1, currentY)).ordinal() != 2) {
-                map[currentX+1][currentY] = 7;
-                queue.add(new MapLocation(currentX+1, currentY));
-            }
-            // check the south eastern square
-            if(currentX != mapWidth-1 && currentY != mapHeight-1 && map[currentX+1][currentY+1] == 0 && rc.senseTerrainTile(new MapLocation(currentX+1, currentY+1)).ordinal() != 2) {
-                map[currentX+1][currentY+1] = 8;
-                queue.add(new MapLocation(currentX+1, currentY+1));
-            }
-            // check the southern square
-            if(currentY != mapHeight-1 && map[currentX][currentY+1] == 0 && rc.senseTerrainTile(new MapLocation(currentX, currentY+1)).ordinal() != 2) {
-                map[currentX][currentY+1] = 1;
-                queue.add(new MapLocation(currentX, currentY+1));
-            }
-            // check the south western square
-            if(currentX != 0 && currentY != mapHeight-1 && map[currentX-1][currentY+1] == 0 && rc.senseTerrainTile(new MapLocation(currentX-1, currentY+1)).ordinal() != 2) {
-                map[currentX-1][currentY+1] = 2;
-                queue.add(new MapLocation(currentX-1, currentY+1));
-            }
-            // check the western square
-            if(currentX != 0 && map[currentX-1][currentY] == 0 && rc.senseTerrainTile(new MapLocation(currentX-1, currentY)).ordinal() != 2) {
-                map[currentX-1][currentY] = 3;
-                queue.add(new MapLocation(currentX-1, currentY));
-            }
-            // check the north western square
-            if(currentX != 0 && currentY != 0 && map[currentX-1][currentY-1] == 0 && rc.senseTerrainTile(new MapLocation(currentX-1, currentY-1)).ordinal() != 2) {
-                map[currentX-1][currentY-1] = 4;
-                queue.add(new MapLocation(currentX-1, currentY-1));
-            }
-
-
-        }
-        return map;
-    }
+//    public static int[][] assessMapWithDirection(RobotController rc, MapLocation goal, int[][] map) throws GameActionException {
+//        ArrayDeque<MapLocation> queue = new ArrayDeque<MapLocation>();
+//        ArrayDeque<MapLocation> enemyQueue = new ArrayDeque<MapLocation>();
+//        int mapWidth = map.length;
+//        int mapHeight = map[0].length;
+//        int currentX;
+//        int currentY;
+//
+//        MapLocation currentLocation;
+//        map[goal.x][goal.y] = 9;
+//
+//        // cant move through HQ's, set their tiles to void
+//        MapLocation temp = rc.senseHQLocation();
+//        map[temp.x][temp.y] = 9;
+//        MapLocation enemyHq = rc.senseEnemyHQLocation();
+//        map[enemyHq.x][enemyHq.y] = 9;
+//
+//        // we dont want to path within range of the enemy hq, set all tiles within range to void.
+//        enemyQueue.add(enemyHq);
+//        while(!enemyQueue.isEmpty()){
+//            currentLocation = enemyQueue.poll();
+//            currentX = currentLocation.x;
+//            currentY = currentLocation.y;
+//
+//            for(Direction dir : allDirections){
+//                temp = currentLocation.add(dir);
+//                if(temp.x != -1 && temp.y != -1 && temp.x < mapWidth && temp.y < mapHeight){
+//                    if(map[temp.x][temp.y] != 9 && enemyHq.distanceSquaredTo(temp) < 35){
+//                        map[temp.x][temp.y] = 9;
+//                        enemyQueue.add(temp);
+//                    }
+//                }
+//            }
+//        }
+//
+//        // we dont want to path within range of any enemy towers. set all tiles within range to void.
+//        MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+//        for (MapLocation tower: enemyTowers) {
+//            enemyQueue.add(tower);
+//            while (!enemyQueue.isEmpty()) {
+//                currentLocation = enemyQueue.poll();
+//                currentX = currentLocation.x;
+//                currentY = currentLocation.y;
+//
+//                for (Direction dir : allDirections) {
+//                    temp = currentLocation.add(dir);
+//                    if (temp.x != -1 && temp.y != -1 && temp.x < mapWidth && temp.y < mapHeight) {
+//                        if (map[temp.x][temp.y] != 9 && enemyHq.distanceSquaredTo(temp) < 24) {
+//                            map[temp.x][temp.y] = 9;
+//                            enemyQueue.add(temp);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        // we want map locations in the queue
+//        queue.add(goal);
+//        while(!queue.isEmpty()) {
+//
+//            currentLocation = queue.poll();
+//            currentX = currentLocation.x;
+//            currentY = currentLocation.y;
+//
+//            // check the northern square
+//            if(currentY != 0 && map[currentX][currentY-1] == 0 && rc.senseTerrainTile(new MapLocation(currentX, currentY-1)).ordinal() != 2) {
+//                map[currentX][currentY-1] = 5;
+//                queue.add(new MapLocation(currentX, currentY-1));
+//
+//            }
+//            // check the north eastern square
+//            if(currentY != 0 && currentX != mapWidth-1 && map[currentX+1][currentY-1] == 0 && rc.senseTerrainTile(new MapLocation(currentX+1, currentY-1)).ordinal() != 2) {
+//                map[currentX+1][currentY-1] = 6;
+//                queue.add(new MapLocation(currentX+1, currentY-1));
+//
+//            }
+//            // check the eastern square
+//            if(currentX != mapWidth-1 && map[currentX+1][currentY] == 0 && rc.senseTerrainTile(new MapLocation(currentX+1, currentY)).ordinal() != 2) {
+//                map[currentX+1][currentY] = 7;
+//                queue.add(new MapLocation(currentX+1, currentY));
+//            }
+//            // check the south eastern square
+//            if(currentX != mapWidth-1 && currentY != mapHeight-1 && map[currentX+1][currentY+1] == 0 && rc.senseTerrainTile(new MapLocation(currentX+1, currentY+1)).ordinal() != 2) {
+//                map[currentX+1][currentY+1] = 8;
+//                queue.add(new MapLocation(currentX+1, currentY+1));
+//            }
+//            // check the southern square
+//            if(currentY != mapHeight-1 && map[currentX][currentY+1] == 0 && rc.senseTerrainTile(new MapLocation(currentX, currentY+1)).ordinal() != 2) {
+//                map[currentX][currentY+1] = 1;
+//                queue.add(new MapLocation(currentX, currentY+1));
+//            }
+//            // check the south western square
+//            if(currentX != 0 && currentY != mapHeight-1 && map[currentX-1][currentY+1] == 0 && rc.senseTerrainTile(new MapLocation(currentX-1, currentY+1)).ordinal() != 2) {
+//                map[currentX-1][currentY+1] = 2;
+//                queue.add(new MapLocation(currentX-1, currentY+1));
+//            }
+//            // check the western square
+//            if(currentX != 0 && map[currentX-1][currentY] == 0 && rc.senseTerrainTile(new MapLocation(currentX-1, currentY)).ordinal() != 2) {
+//                map[currentX-1][currentY] = 3;
+//                queue.add(new MapLocation(currentX-1, currentY));
+//            }
+//            // check the north western square
+//            if(currentX != 0 && currentY != 0 && map[currentX-1][currentY-1] == 0 && rc.senseTerrainTile(new MapLocation(currentX-1, currentY-1)).ordinal() != 2) {
+//                map[currentX-1][currentY-1] = 4;
+//                queue.add(new MapLocation(currentX-1, currentY-1));
+//            }
+//
+//
+//        }
+//        return map;
+//    }
 }
