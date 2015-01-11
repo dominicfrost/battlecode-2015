@@ -108,12 +108,12 @@ public class Util {
     }
 
     public static boolean saftToMoveTo(RobotController rc, MapLocation myLocation,  MapLocation[] enemyTowers, MapLocation enemyHq) {
-        if (myLocation.distancedSquaredTo(enemyHq) <= 35) {
+        if (myLocation.distanceSquaredTo(enemyHq) <= 35) {
             return false;
         }
 
         for (MapLocation tower: enemyTowers) {
-            if (myLocation.distancedSquaredTo(tower) <= 24) {
+            if (myLocation.distanceSquaredTo(tower) <= 24) {
                 return false;
             }
         }
