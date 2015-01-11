@@ -6,6 +6,9 @@ import java.lang.Math.*;
 import battlecode.common.*;
 
 public class RobotPlayer{
+	public static int HARASS_LOCATIONS = 45; // will occupy channels 45 - 57; 
+	public static int SUPPLY_REQUEST_OFFSET = 58; // will occupy channels 58 - 88
+
 	static RobotController rc;
 	static Direction facing;
 	static Random rand;
@@ -55,28 +58,34 @@ public class RobotPlayer{
 
 				case BEAVER:
 					int maxMinerFactories = 2;
-					int maxBarracks = 3;
-					int maxTankFactories = 2;
+					int maxBarracks = 1;
+					int maxTankFactories = 3;
 					int maxHelipads = 1;
-					int maxSupplyDepots = 3;
+					int maxSupplyDepots = 2;
 
 					if(rc.isCoreReady()){
 						if (Clock.getRoundNum() >= 1800){	
-						assault();
+							assault();
 						}
 
 						attackEnemyZero();
 
-						if(getNum(RobotType.MINERFACTORY) < maxMinerFactories){
-							buildUnit(RobotType.MINERFACTORY);	
-						} else if (getNum(RobotType.BARRACKS) < maxBarracks){
-							buildUnit(RobotType.BARRACKS);
-						} else if (getNum(RobotType.SUPPLYDEPOT) < maxSupplyDepots){
-							buildUnit(RobotType.SUPPLYDEPOT);
-						} else if (getNum(RobotType.TANKFACTORY) < maxTankFactories){
-							buildUnit(RobotType.TANKFACTORY);
-						} else if (getNum(RobotType.HELIPAD) < maxHelipads){
-							buildUnit(RobotType.HELIPAD);
+						MapLocation myLoc = rc.getLocation();
+						MapLocation locHQ = rc.senseHQLocation();
+						int distance = (myLoc.distanceSquaredTo(locHQ));
+
+						if (distance < 36){
+							if(getNum(RobotType.MINERFACTORY) < maxMinerFactories){
+								buildUnit(RobotType.MINERFACTORY);	
+							} else if (getNum(RobotType.HELIPAD) < maxHelipads){
+								buildUnit(RobotType.HELIPAD);
+							} else if (getNum(RobotType.BARRACKS) < maxBarracks){
+								buildUnit(RobotType.BARRACKS);
+							} else if (getNum(RobotType.SUPPLYDEPOT) < maxSupplyDepots){
+								buildUnit(RobotType.SUPPLYDEPOT);
+							} else if (getNum(RobotType.TANKFACTORY) < maxTankFactories){
+								buildUnit(RobotType.TANKFACTORY);
+							} 
 						}
 
 						if (spreadOut()){
@@ -145,7 +154,7 @@ public class RobotPlayer{
 				case HELIPAD:
 					if (rc.isCoreReady()){ 
 						if (rc.getTeamOre() >= 125){
-							if (getNum(RobotType.DRONE) < 10){
+							if (getNum(RobotType.DRONE) < 5){
 								spawnUnit(RobotType.DRONE);
 							}
 						}
@@ -154,7 +163,7 @@ public class RobotPlayer{
 
 				case TANK:
 					if (Clock.getRoundNum() >= 1800){	
-					assault();
+						assault();
 					}
 					if ((rc.readBroadcast(5) == 1 || assaulting) && !checkForRetreat()){
 						assaulting = true;
@@ -168,7 +177,7 @@ public class RobotPlayer{
 
 				case SOLDIER:
 					if (Clock.getRoundNum() >= 1800){	
-					assault();
+						assault();
 					}
 					if ((rc.readBroadcast(5) == 1 || assaulting) && !checkForRetreat()){
 						assaulting = true;
@@ -182,7 +191,7 @@ public class RobotPlayer{
 
 				case BASHER:
 					if (Clock.getRoundNum() >= 1800){	
-					assault();
+						assault();
 					}
 					if ((rc.readBroadcast(5) == 1 || assaulting) && !checkForRetreat()){
 						assaulting = true;
@@ -196,17 +205,20 @@ public class RobotPlayer{
 
 
 				case DRONE:
-					if (Clock.getRoundNum() >= 1800){	
-					assault();
+					RobotType[] targets = {RobotType.BEAVER, RobotType.MINER, 
+							RobotType.SOLDIER, RobotType.BASHER};
+					Boolean hunting = false;
+					Boolean supplying = false;
+					double supplyLevel = rc.getSupplyLevel();
+
+					if (rc.isCoreReady()){
+						//if (supplyLevel < 250){
+						//	resupply();
+						//} else {
+						harass(targets);
+						//}
 					}
-					if ((rc.readBroadcast(5) == 1 || assaulting) && !checkForRetreat()){
-						assaulting = true;
-						assault();
-					} else {
-						assaulting = false;
-						attackEnemyZero();
-						headToRallyPoint();
-					}
+
 					break;
 
 				case SUPPLYDEPOT:
@@ -226,53 +238,168 @@ public class RobotPlayer{
 	}
 
 
-	//	private static void harass() throws GameActionException {
-	//		MapLocation myLocation = rc.getLocation();
-	//		Direction moveDirection = null;
-	//		Boolean needToMove = false;
-	//
-	//		RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(15, rc.getTeam().opponent());
-	//		
-	//		// ENEMIES!
-	//		if (nearbyEnemies.length > 0){
-	//			// can they hit me?
-	//			for (RobotInfo enemy : nearbyEnemies){
-	//				// Yes!
-	//				if (myLocation.distanceSquaredTo(enemy.location) <= enemy.type.attackRadiusSquared){
-	//					needToMove = true;
-	//				} 
-	//			}		
-	//			// No they can't, shoot them!
-	//			attackEnemyZero();	
-	//		}
-	//		
-	//		// do i need to move?
-	//		if (needToMove){
-	//			// YES!
-	//			for (Direction dir : Direction.values()){
-	//				// if I move in this direction
-	//				MapLocation moveDir = rc.getLocation().add(dir);
-	//				Boolean safe = true;
-	//				// can this enemy hit me?
-	//				for (RobotInfo enemy : nearbyEnemies){
-	//					// Yes!
-	//					if (moveDir.distanceSquaredTo(enemy.location) <= enemy.type.attackRadiusSquared){
-	//						safe = false;
-	//					}
-	//				}
-	//				// chumps can't touch this, this is my safe direction
-	//				moveDirection = dir;
-	//			}
-	//		// nah i'm good, lets head towards base
-	//		} else {
-	//			moveDirection = getMoveDir(rc.senseEnemyHQLocation());
-	//		}
-	//		
-	//		rc.move(moveDirection);
-	//		
-	//	}
+	private static void resupply() throws GameActionException {
+		MapLocation locHQ = rc.senseHQLocation();
+		Direction dirToHQ = rc.getLocation().directionTo(locHQ);
+		int distToHQ = rc.getLocation().distanceSquaredTo(locHQ);
 
-private static Boolean checkForRetreat() throws GameActionException {
+
+		if (rc.canMove(dirToHQ)){
+			rc.move(dirToHQ);
+		}
+
+	}
+
+
+	private static void harass(RobotType[] targets) throws GameActionException {
+
+		MapLocation myLocation = rc.getLocation();
+		int sensorRange = rc.getType().sensorRadiusSquared;
+		int attackRange = rc.getType().attackRadiusSquared;
+		RobotInfo[] enemiesInSight = rc.senseNearbyRobots(sensorRange, rc.getTeam().opponent());
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(attackRange, rc.getTeam().opponent());
+
+		Direction nextMove = null;
+
+		// enemies in range
+		if (enemiesInRange.length > 0){
+			// shoot targets
+			attackByType(enemiesInRange, targets);
+		}
+
+		// enemies in sight
+		if (enemiesInSight.length > 0){
+			Boolean safe = true;
+
+			// can any of these guys hit me?
+			for (RobotInfo enemy : enemiesInSight){
+				int enemyRange = enemy.type.attackRadiusSquared;
+				int distanceFromEnemy = myLocation.distanceSquaredTo(enemy.location);
+
+				if (enemyRange >= distanceFromEnemy){
+					safe = false;
+				}
+			}
+			// kite
+			nextMove = kiteDirection(myLocation, enemiesInSight);
+			if (nextMove != null){
+				rc.move(nextMove);
+			}
+		} else {
+			rc.move(getMoveDir(rc.senseEnemyHQLocation()));
+		}
+
+		// enemies in range
+		if (enemiesInRange.length > 0){
+			// shoot targets
+			attackByType(enemiesInRange, targets);
+		}
+	}
+
+
+	// Assign a value to all surrounding squares. The square with the lowest value is returned, directions towards
+	// enemy HQ are given preference. Square value = (2 * damage going to take next turn in that square) - (damage 
+	// robot can inflict). 
+	private static Direction kiteDirection(MapLocation baseSquare, RobotInfo[] enemiesInSight) {
+
+		Direction dirToMove = null;
+		int myRange = rc.getType().attackRadiusSquared;
+		double[] squareValues = new double[8];
+		double lowestVal = 0.0;
+
+		// base case
+		for (RobotInfo enemy : enemiesInSight){
+			int enemyRange = enemy.type.attackRadiusSquared;
+			int distanceFromEnemy = baseSquare.distanceSquaredTo(enemy.location);
+
+			// if an enemy can hit me, add 2 * its damage to this square
+			if (enemyRange >= distanceFromEnemy){
+				lowestVal += (2 * enemy.type.attackPower);
+			}
+			// if I can hit an enemy, add 1 * my damage to this square
+			if (distanceFromEnemy <= myRange){
+				lowestVal -= (rc.getType().attackPower);
+			}
+		}
+
+		// for each surrounding square
+		for (Direction dir : Direction.values()){
+			int index = directionToInt(dir);
+
+			// determine value of each square
+			for (RobotInfo enemy : enemiesInSight){
+				int enemyRange = enemy.type.attackRadiusSquared;
+				int distanceFromEnemy = baseSquare.add(dir).distanceSquaredTo(enemy.location);
+
+				// if an enemy can hit me, add 2 * its damage to this square
+				if (enemyRange >= distanceFromEnemy){
+					squareValues[index] += (2 * enemy.type.attackPower);
+				}
+
+				// if I can hit an enemy, add 1 * my damage to this square
+				if (distanceFromEnemy <= myRange){
+					squareValues[index] -= (rc.getType().attackPower);
+				}
+			}
+
+			// if this direction is safer than last one, set to move there
+			if (squareValues[index] <= lowestVal && rc.canMove(dir)){
+				lowestVal = squareValues[index];
+				dirToMove = intToDirection(index);
+			}	
+		}
+		return dirToMove;
+
+	}
+
+	public static Direction intToDirection(int i) {
+		switch(i) {
+		case 0:
+			return Direction.NORTH;
+		case 1:
+			return Direction.NORTH_EAST;
+		case 2:
+			return Direction.EAST;
+		case 3:
+			return Direction.SOUTH_EAST;
+		case 4:
+			return Direction.SOUTH;
+		case 5:
+			return Direction.SOUTH_WEST;
+		case 6:
+			return Direction.WEST;
+		case 7:
+			return Direction.NORTH_WEST;
+		default:
+			return Direction.NORTH;
+		}
+	}
+
+	public static int directionToInt(Direction d) {
+		switch(d) {
+		case NORTH:
+			return 0;
+		case NORTH_EAST:
+			return 1;
+		case EAST:
+			return 2;
+		case SOUTH_EAST:
+			return 3;
+		case SOUTH:
+			return 4;
+		case SOUTH_WEST:
+			return 5;
+		case WEST:
+			return 6;
+		case NORTH_WEST:
+			return 7;
+		default:
+			return 0;
+		}
+	}
+
+
+	private static Boolean checkForRetreat() throws GameActionException {
 		int remainingTroops = rc.readBroadcast(6) + 1;
 		rc.broadcast(6, remainingTroops);
 		if (remainingTroops < 10){
@@ -285,7 +412,7 @@ private static Boolean checkForRetreat() throws GameActionException {
 
 	private static void assault() throws GameActionException {
 		MapLocation target = getAssaultOrders();
-		
+
 		if (rc.getLocation().distanceSquaredTo(target) < Math.sqrt(rc.getType().attackRadiusSquared)){
 			if (rc.isWeaponReady() && rc.canAttackLocation(target)){
 				rc.attackLocation(target);
@@ -293,7 +420,7 @@ private static Boolean checkForRetreat() throws GameActionException {
 		} else {
 			attackEnemyZero();
 		}
-		
+
 
 		Direction toMove = getMoveDir(target);
 		if (toMove != null){
@@ -328,12 +455,12 @@ private static Boolean checkForRetreat() throws GameActionException {
 
 	private static void assaultReady() throws GameActionException {
 		int armySize =  getNum(RobotType.SOLDIER) + getNum(RobotType.BASHER) + getNum(RobotType.TANK) + getNum(RobotType.DRONE);
-		if (armySize >= 40){
+		if (armySize >= 20){
 			rc.broadcast(5, 1);
 		} else {
 			rc.broadcast(5, 0);
 		}
-		
+
 		rc.broadcast(6, 0);
 	}
 
@@ -579,6 +706,31 @@ private static Boolean checkForRetreat() throws GameActionException {
 				rc.attackLocation(nearbyEnemies[0].location);
 			}
 		}
+
+	}
+
+	private static void attackByType(RobotInfo[] enemies, RobotType[] targetTypes) throws GameActionException {
+		if (!rc.isWeaponReady()){
+			return;
+		}
+
+		RobotInfo target = enemies[0];
+		double lowestHealth = enemies[0].health;
+
+		for (RobotInfo enemy : enemies){
+			for (RobotType tType : targetTypes){
+				if (enemy.type == tType && enemy.health < lowestHealth){
+					target = enemy;
+					lowestHealth = target.health;	
+				}
+			}
+		}
+
+
+		if (rc.canAttackLocation(target.location)){
+			rc.attackLocation(target.location);
+		}
+
 
 	}
 

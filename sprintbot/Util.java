@@ -1,6 +1,7 @@
 package sprintbot;
 
 import battlecode.common.*;
+
 import java.util.*;
 
 public class Util {
@@ -447,4 +448,122 @@ public class Util {
 
         return mLine;
     }
+    
+    public static void harass(RobotController rc, RobotType[] targets) throws GameActionException {
+		MapLocation myLocation = rc.getLocation();
+		int sensorRange = rc.getType().sensorRadiusSquared;
+		int attackRange = rc.getType().attackRadiusSquared;
+		RobotInfo[] enemiesInSight = rc.senseNearbyRobots(sensorRange, rc.getTeam().opponent());
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(attackRange, rc.getTeam().opponent());
+
+		Direction nextMove = null;
+
+		// enemies in range
+		if (enemiesInRange.length > 0){
+			// shoot targets
+			attackByType(rc, enemiesInRange, targets);
+		}
+
+		// enemies in sight
+		if (enemiesInSight.length > 0){
+			Boolean safe = true;
+
+			// can any of these guys hit me?
+			for (RobotInfo enemy : enemiesInSight){
+				int enemyRange = enemy.type.attackRadiusSquared;
+				int distanceFromEnemy = myLocation.distanceSquaredTo(enemy.location);
+
+				if (enemyRange >= distanceFromEnemy){
+					safe = false;
+				}
+			}
+			// kite
+			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
+			if (nextMove != null){
+				rc.move(nextMove);
+			}
+		} else {
+			rc.move(moveToLocation(rc, rc.senseEnemyHQLocation()));
+		}
+
+		// enemies in range
+		if (enemiesInRange.length > 0){
+			// shoot targets
+			attackByType(rc, enemiesInRange, targets);
+		}
+	}
+
+
+	private static Direction moveToLocation(RobotController rc, MapLocation loc) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// Assign a value to all surrounding squares. The square with the lowest value is returned, directions towards
+	// enemy HQ are given preference. Square value = (2 * damage going to take next turn in that square) - (damage 
+	// robot can inflict). 
+	private static Direction kiteDirection(RobotController rc, MapLocation baseSquare, RobotInfo[] enemiesInSight) {
+		Direction dirToMove = null;
+		int myRange = rc.getType().attackRadiusSquared;
+		double[] squareValues = new double[8];
+		double lowestVal = 0.0;
+
+		// base case
+		for (RobotInfo enemy : enemiesInSight){
+			int enemyRange = enemy.type.attackRadiusSquared;
+			int distanceFromEnemy = baseSquare.distanceSquaredTo(enemy.location);
+
+			// if an enemy can hit me, add 2 * its damage to this square
+			if (enemyRange >= distanceFromEnemy){
+				lowestVal += (2 * enemy.type.attackPower);
+			}
+			// if I can hit an enemy, add 1 * my damage to this square
+			if (distanceFromEnemy <= myRange){
+				lowestVal -= (rc.getType().attackPower);
+			}
+		}
+
+		// for each surrounding square
+		for (Direction dir : Direction.values()){
+			int index = directionToInt(dir);
+			// determine value of each square
+			for (RobotInfo enemy : enemiesInSight){
+				int enemyRange = enemy.type.attackRadiusSquared;
+				int distanceFromEnemy = baseSquare.add(dir).distanceSquaredTo(enemy.location);
+				// if an enemy can hit me, add 2 * its damage to this square
+				if (enemyRange >= distanceFromEnemy){
+					squareValues[index] += (2 * enemy.type.attackPower);
+				}
+				// if I can hit an enemy, add 1 * my damage to this square
+				if (distanceFromEnemy <= myRange){
+					squareValues[index] -= (rc.getType().attackPower);
+				}
+			}
+			// if this direction is safer than last one, set to move there
+			if (squareValues[index] <= lowestVal && rc.canMove(dir)){
+				lowestVal = squareValues[index];
+				dirToMove = intToDirection(index);
+			}	
+		}
+		return dirToMove;
+	}
+	private static void attackByType(RobotController rc, RobotInfo[] enemies, RobotType[] targetTypes) throws GameActionException {
+		if (!rc.isWeaponReady()){
+			return;
+		}
+		RobotInfo target = enemies[0];
+		double lowestHealth = enemies[0].health;
+
+		for (RobotInfo enemy : enemies){
+			for (RobotType tType : targetTypes){
+				if (enemy.type == tType && enemy.health < lowestHealth){
+					target = enemy;
+					lowestHealth = target.health;	
+				}
+			}
+		}
+		if (rc.canAttackLocation(target.location)){
+			rc.attackLocation(target.location);
+		}
+	}
 }
