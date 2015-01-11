@@ -126,8 +126,7 @@ public class HQ {
     public static double spawningRule(int[] allyTypeCount, RobotType type, int numDesired, double oreRemaining, int limit) throws GameActionException {
         if (allyTypeCount[type.ordinal()] < numDesired) {
             //we want to spawn numDesired - our robot count for the given type
-            //however we could be limited by the number of structures we have
-            // e.g. We can only spawn 2 miners if we have 2 mine factories in one round, we could not spawn 3 miners
+            //however we could be limited by the number of builder structures we have
             // so we take the smaller of limit and numDesired - our robot count for the given type
             int numToSpawn = Math.min(numDesired - allyTypeCount[type.ordinal()], limit);
             rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToSpawn);

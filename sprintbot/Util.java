@@ -106,6 +106,20 @@ public class Util {
         }
     }
 
+    public static boolean saftToMoveTo(RobotController rc, MapLocation myLocation,  MapLocation[] enemyTowers, MapLocation enemyHq) {
+        if (myLocation.distancedSquaredTo(enemyHq) <= 35) {
+            return false;
+        }
+
+        for (MapLocation tower: enemyTowers) {
+            if (myLocation.distancedSquaredTo(tower) <= 24) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     // This method will attempt to build in the given direction (or as close to it as possible)
     public static void tryBuild(RobotController rc, Direction d, RobotType type) throws GameActionException {
         int offsetIndex = 0;
