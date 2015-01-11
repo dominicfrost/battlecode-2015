@@ -22,7 +22,7 @@ public class Util {
         for (RobotType type: canBuild) {
             numToBuild = rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal());
             if (numToBuild > 0 && myOre >= type.oreCost) {
-                trySpawn(rc, d, type);
+                tryBuild(rc, d, type);
                 numToBuild--;
                 rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToBuild);
                 return true;

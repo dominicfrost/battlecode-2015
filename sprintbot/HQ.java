@@ -116,11 +116,16 @@ public class HQ {
     }
 
     // this function broadcasts the number to spawn of a given type if we have less of that robot type than numDesired
-    public static double spawningRule(int[] allyTypeCount, RobotType type, int numDesired, double oreRemaining) throws GameActionException {
+    public static double spawningRule(int[] allyTypeCount, RobotType type, int numDesired, double oreRemaining, int limit) throws GameActionException {
         if (allyTypeCount[type.ordinal()] < numDesired) {
-            int numToSpawn = numDesired - allyTypeCount[type.ordinal()];
+            //we want to spawn numDesired - our robot count for the given type
+            //however we could be limited by the number of structures we have
+            // e.g. We can only spawn 2 miners if we have 2 mine factories in one round, we could not spawn 3 miners
+            // so we take the smaller of limit and numDesired - our robot count for the given type
+            int numToSpawn = Math.min(numDesired - allyTypeCount[type.ordinal()], limit);
             rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToSpawn);
             oreRemaining = oreRemaining - (type.oreCost * numToSpawn);
+            System.out.println("Spawning " + numToSpawn + " " + type.toString() + " " + oreRemaining + " ore remaining");
         }
 
         return oreRemaining;
@@ -129,7 +134,26 @@ public class HQ {
     //set the spawning precedence here
     public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
         double remainingOre = rc.getTeamOre();
-        if (spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre) < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, 1);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.BARRACKS, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANKFACTORY, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 5, remainingOre, 1);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANK, 5, remainingOre, 1);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANKFACTORY, 3, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 3, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.TANK, 25, remainingOre, 3);
+        if (remainingOre < 0) return;
     }
 
 
