@@ -16,16 +16,18 @@ public class Util {
             return false;
         }
 
-        RobotType toBuild = getRobotTypeToSpawn(rc);
-        if (Arrays.asList(canBuild).indexOf(toBuild) > -1) {
-            double myOre = rc.getTeamOre();
-            if (myOre >= toBuild.oreCost) {
-                //System.out.println("Building " + toBuild.toString());
-                tryBuild(rc, d, toBuild);
+        int numToBuild;
+        double myOre = rc.getTeamOre();
+
+        for (RobotType type: canBuild) {
+            numToBuild = rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal());
+            if (numToBuild > 0 && myOre >= type.oreCost) {
+                trySpawn(rc, d, type);
+                numToBuild--;
+                rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToBuild);
                 return true;
             }
         }
-
         return false;
     }
 
@@ -37,16 +39,18 @@ public class Util {
             return false;
         }
 
-        RobotType toSpawn = getRobotTypeToSpawn(rc);
-        if (Arrays.asList(canSpawn).indexOf(toSpawn) > -1) {
-            double myOre = rc.getTeamOre();
-            if (myOre >= toSpawn.oreCost) {
-                //System.out.println("Spawning " + toSpawn.toString());
-                trySpawn(rc, d, toSpawn);
+        int numToSpawn;
+        double myOre = rc.getTeamOre();
+
+        for (RobotType type: canSpawn) {
+            numToSpawn = rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal());
+            if (numToSpawn > 0 && myOre >= type.oreCost) {
+                trySpawn(rc, d, type);
+                numToSpawn--;
+                rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToSpawn);
                 return true;
             }
         }
-
         return false;
     }
 

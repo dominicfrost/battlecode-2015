@@ -115,64 +115,21 @@ public class HQ {
         broadcastNextAttackLocation();
     }
 
+    // this function broadcasts the number to spawn of a given type if we have less of that robot type than numDesired
+    public static double spawningRule(int[] allyTypeCount, RobotType type, int numDesired, double oreRemaining) throws GameActionException {
+        if (allyTypeCount[type.ordinal()] < numDesired) {
+            int numToSpawn = numDesired - allyTypeCount[type.ordinal()];
+            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToSpawn);
+            oreRemaining = oreRemaining - (type.oreCost * numToSpawn);
+        }
+
+        return oreRemaining;
+    }
+
+    //set the spawning precedence here
     public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
-        if (allyTypeCount[RobotType.BEAVER.ordinal()] < 5) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.BEAVER.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.MINERFACTORY.ordinal()] < 3) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINERFACTORY.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.MINER.ordinal()] < 10) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINER.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.BARRACKS.ordinal()] < 2) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.BARRACKS.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.SOLDIER.ordinal()] < 10) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.SOLDIER.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.MINER.ordinal()] < 20) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINER.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.TANKFACTORY.ordinal()] < 1) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANKFACTORY.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.TANK.ordinal()] < 5) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANK.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.HELIPAD.ordinal()] < 2) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.HELIPAD.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.DRONE.ordinal()] < 5) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.DRONE.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.TANK.ordinal()] < 10) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANK.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.DRONE.ordinal()] < 10) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.DRONE.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.MINERFACTORY.ordinal()] < 4) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINERFACTORY.ordinal());
-            return;
-        }
-        if (allyTypeCount[RobotType.MINER.ordinal()] < 30) {
-            rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.MINER.ordinal());
-            return;
-        }
-        rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET, RobotType.TANK.ordinal());
+        double remainingOre = rc.getTeamOre();
+        if (spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre) < 0) return;
     }
 
 
