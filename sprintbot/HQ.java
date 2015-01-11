@@ -129,7 +129,8 @@ public class HQ {
     //set the spawning precedence here
     public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
         double remainingOre = rc.getTeamOre();
-        if (spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre) < 0) return;
+        if (spawningRule(allyTypeCount, RobotType.BEAVER, 5, remainingOre) < 0)
+        	return;
     }
 
 
