@@ -11,7 +11,7 @@ public class LAUNCHER {
 
     public static void execute(RobotController rc_in) throws GameActionException {
         rc = rc_in;
-        if (!tryLaunch()) {
+        if (!tryLaunch(rc)) {
             if (goal == null) {
                 int towerIndex = rc.readBroadcast(MyConstants.ALONE_TOWER_INDEX);
                 if (towerIndex < RobotPlayer.myTowers.length) {
@@ -20,12 +20,12 @@ public class LAUNCHER {
                 }
             }
             if (atGoal == false) {
-                Pathing.straitBuggin(rc, goal);
+                atGoal = Pathing.straitBuggin(rc, goal);
             }
         }
     }
 
-    public static boolean tryLaunch() throws GameActionException{
+    public static boolean tryLaunch(RobotController rc) throws GameActionException{
         if (rc.isCoreReady() && rc.getMissileCount() > 0) {
             // get the direction to launch
             // this direction is the direction to the weighted avg of enemy locations
