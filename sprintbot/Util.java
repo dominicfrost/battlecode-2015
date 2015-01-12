@@ -13,7 +13,7 @@ public class Util {
 	 * spawns the current spawn type if possible
 	 */
 	public static boolean buildWithPrecedence(RobotController rc, Direction d, RobotType[] canBuild) throws GameActionException{
-		if (!rc.isCoreReady()) {
+		if (!RobotPlayer.coreReady) {
 			return false;
 		}
 
@@ -36,7 +36,7 @@ public class Util {
 	 * spawns the current spawn type if possible
 	 */
 	public static boolean spawnWithPrecedence(RobotController rc, Direction d, RobotType[] canSpawn) throws GameActionException{
-		if (!rc.isCoreReady()) {
+		if (!RobotPlayer.coreReady) {
 			return false;
 		}
 
@@ -58,7 +58,7 @@ public class Util {
 	public static void generalAttack(RobotController rc) throws GameActionException{
 		MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
 		System.out.println("GOAL: " + goal.toString());
-		if (rc.isCoreReady()) {
+		if (RobotPlayer.coreReady) {
 			if (rc.canAttackLocation(goal)) {
 				System.out.println("can attack goal!: " + goal.toString());
 				rc.attackLocation(goal);
@@ -184,7 +184,7 @@ public class Util {
 	//move to the most fruitful tile, unless there are several w/ same amount, then pick one of them at random
 	//frig
 	public static void SmartMine(RobotController rc) throws GameActionException {
-		if (!rc.isCoreReady()) {
+		if (!RobotPlayer.coreReady) {
 			return;
 		}
 
@@ -236,7 +236,7 @@ public class Util {
 
 	// mine like a dummy
 	public static void mine(RobotController rc) throws GameActionException {
-		if (!rc.isCoreReady()) {
+		if (!RobotPlayer.coreReady) {
 			return;
 		}
 
@@ -350,7 +350,7 @@ public class Util {
 
 
 	public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
-		if (rc.isWeaponReady() && enemyRobots.length > 0) {
+		if (RobotPlayer.weaponReady && enemyRobots.length > 0) {
 			MapLocation myLocation = rc.getLocation();
 			RobotInfo toAttack = enemyRobots[0];
 			int closest = Integer.MAX_VALUE;
@@ -390,29 +390,29 @@ public class Util {
 
 	public static boolean harass(RobotController rc, RobotType[] targets) throws GameActionException {
 		MapLocation myLocation = rc.getLocation();
-		int sensorRange = rc.getType().sensorRadiusSquared;
-		int attackRange = rc.getType().attackRadiusSquared;
-		RobotInfo[] enemiesInSight = rc.senseNearbyRobots(sensorRange, rc.getTeam().opponent());
-		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(attackRange, rc.getTeam().opponent());
+		RobotInfo[] enemiesInSight = rc.senseNearbyRobots(RobotPlayer.sensorRange, rc.getTeam().opponent());
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(RobotPlayer.attackRange, rc.getTeam().opponent());
 
 		Direction nextMove = null;
 
 		// enemies in range
-		if (enemiesInRange.length > 0){
+		if (enemiesInRange.length > 0 && RobotPlayer.weaponReady){
 			// shoot targets
 			attackByType(rc, enemiesInRange, targets);
 		}
 
-		// enemies in sight
-		if (enemiesInSight.length > 0){
-			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
-			if (nextMove != null){
-				rc.move(nextMove);
-				return true;
-			}
-		} else {
-			moveToLocation(rc, rc.senseEnemyHQLocation());
-		}
+        // enemies in sight
+        if (enemiesInSight.length > 0 && RobotPlayer.coreReady) {
+            nextMove = kiteDirection(rc, myLocation, enemiesInSight);
+
+            if (nextMove != null) {
+                rc.move(nextMove);
+                if (RobotPlayer.weaponReady) {
+                    attackByType(rc, enemiesInRange, targets);
+                }
+            }
+            return true;
+        }
 
 		return false;
 	}
@@ -449,7 +449,7 @@ public class Util {
 		}
 
 		// for each surrounding square
-		for (Direction dir : Direction.values()){
+		for (Direction dir : directions){
 			int index = directionToInt(dir);
 			// determine value of each square
 			for (RobotInfo enemy : enemiesInSight){
@@ -463,13 +463,13 @@ public class Util {
 				if(!safeToMove){
 					squareValues[index] += (2 * RobotType.TOWER.attackPower);
 				}
-				// if I can hit an enemy, add 1 * my damage to this square
+				// if I can hit an enemy, add 1
 				if (distanceFromEnemy <= myRange){
 					squareValues[index] -= 1;
 				}
 			}
 			// if this direction is safer than last one, set to move there
-			if (squareValues[index] <= lowestVal && rc.canMove(dir)){
+			if (squareValues[index] < lowestVal && rc.canMove(dir)){
 				lowestVal = squareValues[index];
 				dirToMove = intToDirection(index);
 			}	
@@ -477,9 +477,9 @@ public class Util {
 		return dirToMove;
 	}
 	private static void attackByType(RobotController rc, RobotInfo[] enemies, RobotType[] targetTypes) throws GameActionException {
-		if (!rc.isWeaponReady()){
-			return;
-		}
+        if (targetTypes.length == 0) {
+            return;
+        }
 		RobotInfo target = enemies[0];
 		double lowestHealth = enemies[0].health;
 
