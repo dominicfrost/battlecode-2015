@@ -26,7 +26,7 @@ public class Pathing {
             //if we aren't on the mLine we f'd up so quit out
             int myLocationIndex = mLine.indexOf(myLocation);
             if (myLocationIndex == -1) {
-                System.out.println("BUG FAILURE: not on mLine when i should be");
+                //System.out.println("BUG FAILURE: not on mLine when i should be");
                 return false;
             }
 
@@ -123,7 +123,7 @@ public class Pathing {
             return false;
         }
         for (MapLocation towerLoc: RobotPlayer.enemyTowers) {
-            if (rc.getLocation().add(dir).distanceSquaredTo(towerLoc) <= 25) {
+            if (rc.getLocation().add(dir).distanceSquaredTo(towerLoc) <= 24) {
                 return false;
             }
         }
@@ -132,12 +132,18 @@ public class Pathing {
     }
 
     public static boolean doMove(RobotController rc, Direction dir) throws GameActionException {
-        if (exitCase(rc)) return false;
+        while (!rc.isCoreReady()) {
+            rc.yield();
+        }
+        if (exitCase(rc)) {
+            return false;
+        }
 
         while (!rc.canMove(dir) || !rc.isCoreReady()) {
             rc.yield();
         }
         rc.move(dir);
+        rc.yield();
         return true;
     }
 

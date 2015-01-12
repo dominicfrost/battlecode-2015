@@ -57,21 +57,21 @@ public class Util {
 
     public static void generalAttack(RobotController rc) throws GameActionException{
         MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
-        System.out.println("GOAL: " + goal.toString());
+        //System.out.println("GOAL: " + goal.toString());
         if (rc.isCoreReady()) {
             if (rc.canAttackLocation(goal)) {
-                System.out.println("can attack goal!: " + goal.toString());
+                //System.out.println("can attack goal!: " + goal.toString());
                 rc.attackLocation(goal);
                 return;
             }
             RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
             if (!attack(rc, enemyRobots)) {
                 if (rc.getHealth() < 40) {
-                    System.out.println("my health or supply is too low, going to hq");
+                    //System.out.println("my health or supply is too low, going to hq");
                     tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
                     return;
                 }
-                System.out.println("moving to goal!: " + goal.toString());
+                //System.out.println("moving to goal!: " + goal.toString());
                 tryMove(rc, rc.getLocation().directionTo(goal));
             }
         }
@@ -187,7 +187,7 @@ public class Util {
         
         if(!flee(rc,rc.senseNearbyRobots(rc.getLocation(),24, RobotPlayer.enemyTeam)))
         {
-        	System.out.println("TAINT FLEE");
+        	//System.out.println("TAINT FLEE");
 	        MapLocation myLocation = rc.getLocation();
 	        double oreCount = rc.senseOre(myLocation);
 	        ArrayList<Integer> OreLocations = new ArrayList<Integer>();
@@ -397,7 +397,7 @@ public class Util {
 		// enemies in range
 		if (enemiesInRange.length > 0){
 			// shoot targets
-			attackByType(rc, enemiesInRange, targets);
+			//attackByType(rc, enemiesInRange, targets);
             return true;
 		}
 
@@ -420,8 +420,6 @@ public class Util {
 				rc.move(nextMove);
                 return true;
 			}
-		} else {
-			moveToLocation(rc, rc.senseEnemyHQLocation());
 		}
 
 		return false;
@@ -494,4 +492,10 @@ public class Util {
 			rc.attackLocation(target.location);
 		}
 	}
+
+    public static void debug(RobotController rc, String msg) {
+        if (rc.getID() == 34293) {
+            System.out.println("DEBUG: " + msg);
+        }
+    }
 }
