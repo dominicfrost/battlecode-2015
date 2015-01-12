@@ -12,7 +12,6 @@ public class RobotPlayer {
     static MapLocation myHq;
     static MapLocation[] enemyTowers;
     static MapLocation[] myTowers;
-    static MapLocation[] avoid;
 
 	public static void run(RobotController rc) {
         myTeam = rc.getTeam();
@@ -20,8 +19,8 @@ public class RobotPlayer {
         rand = new Random(rc.getID());
         enemyHq = rc.senseEnemyHQLocation();
         enemyTowers = rc.senseEnemyTowerLocations();
-        myHq = rc.senseEnemyHQLocation();
-        myTowers = rc.senseEnemyTowerLocations();
+        myHq = rc.senseHQLocation();
+        myTowers = rc.senseTowerLocations();
 
 		while(true) {
 
