@@ -71,7 +71,7 @@ public class HQ {
 			double incProp = (1 / (numPoints - 1));
 			
 			int xCoordinate = (int)(i * (incProp) * finalXLine);
-			int yCoordinate = (int)(1 - (incProp)* finalYLine);
+			int yCoordinate = (int)(1 - (incProp) * finalYLine);
 			
 			MapLocation nextPoint = new MapLocation(xCoordinate, yCoordinate); 
 			pointsOfInterest[i + 2] = nextPoint;

@@ -6,4 +6,5 @@ public class MyConstants {
     public static int ATTACK_LOCATION = 43; //will occupy channels 43 - 44
     public static int POINTS_OF_INTEREST_OFFSET = 45; // will occupy channels 45 - 65; 
     public static int ALONE_TOWER_INDEX = 66; //stores the index of the tower we want to send launcher to protect
+    public static int TOWER_UNDER_DISTRESS = 67; //occupies 67-73
 }
