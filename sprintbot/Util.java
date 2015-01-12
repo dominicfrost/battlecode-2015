@@ -336,7 +336,7 @@ public class Util {
         return mLine;
     }
     
-    public static void harass(RobotController rc, RobotType[] targets) throws GameActionException {
+    public static boolean harass(RobotController rc, RobotType[] targets) throws GameActionException {
 		MapLocation myLocation = rc.getLocation();
 		int sensorRange = rc.getType().sensorRadiusSquared;
 		int attackRange = rc.getType().attackRadiusSquared;
@@ -349,6 +349,7 @@ public class Util {
 		if (enemiesInRange.length > 0){
 			// shoot targets
 			attackByType(rc, enemiesInRange, targets);
+            return true;
 		}
 
 		// enemies in sight
@@ -368,16 +369,11 @@ public class Util {
 			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
 			if (nextMove != null){
 				rc.move(nextMove);
+                return true;
 			}
-		} else {
-			rc.move(moveToLocation(rc, rc.senseEnemyHQLocation()));
 		}
 
-		// enemies in range
-		if (enemiesInRange.length > 0){
-			// shoot targets
-			attackByType(rc, enemiesInRange, targets);
-		}
+		return false;
 	}
 
 
