@@ -115,7 +115,7 @@ public class Util {
         int[] offsets = {0,1,-1,2,-2};
         int dirint = directionToInt(goalDir);
 
-        for (int i = 0; i < offsets.length; i++) {
+        masterLoop: for (int i = 0; i < offsets.length; i++) {
             Direction targetDir = directions[(dirint+offsets[i]+8)%8];
             if (!rc.canMove(targetDir)) {
                 //continue in loop if we cant move to the target location
@@ -126,7 +126,7 @@ public class Util {
                 MapLocation towerLocation = RobotPlayer.enemyTowers[j];
                 if (targetLocation.distanceSquaredTo(towerLocation) <= 24) {
                     // continue in loop if the location is within range of an enemy tower
-                    continue;
+                    continue masterLoop;
                 }
             }
 
