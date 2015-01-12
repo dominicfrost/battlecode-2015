@@ -22,7 +22,7 @@ public class DRONE {
 			if (supplyLevel < 300) {
 				Util.moveToLocation(rc, RobotPlayer.myHq);
 			} else {
-				Pathing.straitBuggin(rc, pointOfInterest);
+				Util.harass(rc, targets);
 			}
 		}
 	}
