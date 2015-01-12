@@ -156,7 +156,7 @@ public class Util {
         	System.out.println("TAINT FLEE");
 	        MapLocation myLocation = rc.getLocation();
 	        double oreCount = rc.senseOre(myLocation);
-	        ArrayList OreLocations = new ArrayList();
+	        ArrayList<Integer> OreLocations = new ArrayList<Integer>();
 	        
 	        double ore_N = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH, myLocation));
 	        double ore_NE = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_EAST, myLocation));

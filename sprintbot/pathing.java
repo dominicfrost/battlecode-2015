@@ -129,7 +129,7 @@ public class Pathing {
         switch (type) {
             case DRONE:
                 return Util.harass(rc, DRONE.targets);
-            case LAUCHER:
+            case LAUNCHER:
                 return LAUNCHER.tryLaunch(rc);
         }
 
