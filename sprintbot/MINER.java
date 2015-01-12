@@ -8,7 +8,7 @@ public class MINER {
         rc = rc_in;
         int executeStartRound = Clock.getRoundNum();
         if (rc.isCoreReady()) {
-            Util.mine(rc);
+            Util.SmartMine(rc);
         }
         if (executeStartRound == Clock.getRoundNum()) {
             rc.yield();
