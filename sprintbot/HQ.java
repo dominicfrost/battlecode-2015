@@ -31,9 +31,8 @@ public class HQ {
         for (RobotInfo r : myRobots) {
             RobotType rt = r.type;
 
-            if (r.supplyLevel < 2000 && RobotPlayer.myHq.distanceSquaredTo(r.location) <= 15) {
-                rc.transferSupplies((int) Math.min(2000 - r.supplyLevel, rc.getSupplyLevel()), r.location);
-            }
+            // The max amount of supply we want any robot to acquire from the HQ
+            int maxRobotSupply = 500;
 
             switch (rt) {
                 case AEROSPACELAB:
@@ -55,6 +54,9 @@ public class HQ {
                     typeCount[RobotType.COMPUTER.ordinal()]++;
                     break;
                 case DRONE:
+                    // TODO: this may change when we figure out how much supply drones
+                    // are actually using and how much we have to offer
+                    maxRobotSupply = Math.min(4000, (2000 - Clock.getRoundNum()) * 5);
                     typeCount[RobotType.DRONE.ordinal()]++;
                     break;
                 case HANDWASHSTATION:
@@ -99,6 +101,10 @@ public class HQ {
                 case TRAININGFIELD:
                     typeCount[RobotType.TRAININGFIELD.ordinal()]++;
                     break;
+            }
+
+            if (r.supplyLevel < maxRobotSupply && RobotPlayer.myHq.distanceSquaredTo(r.location) <= 15) {
+                rc.transferSupplies((int) Math.min(maxRobotSupply - r.supplyLevel, rc.getSupplyLevel()), r.location);
             }
         }
 

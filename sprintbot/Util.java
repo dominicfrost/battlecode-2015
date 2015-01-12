@@ -332,7 +332,7 @@ public class Util {
 
 
     public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
-        if (rc.isWeaponReady()) {
+        if (rc.isWeaponReady() && enemyRobots.length > 0) {
             MapLocation myLocation = rc.getLocation();
             RobotInfo toAttack = enemyRobots[0];
             int closest = Integer.MAX_VALUE;
