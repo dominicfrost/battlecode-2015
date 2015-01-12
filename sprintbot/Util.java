@@ -412,21 +412,12 @@ public class Util {
 			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
 			if (nextMove != null){
 				rc.move(nextMove);
-				return true;
+				if(RobotPlayer.weaponReady){
+					attackByType(rc, enemiesInRange, targets);
+				}
 			}
-		} else {
-			moveToLocation(rc, rc.senseEnemyHQLocation());
+			return true;
 		}
-
-            if (nextMove != null) {
-                rc.move(nextMove);
-                if (RobotPlayer.weaponReady) {
-                    attackByType(rc, enemiesInRange, targets);
-                }
-            }
-            return true;
-        }
-
 		return false;
 	}
 
