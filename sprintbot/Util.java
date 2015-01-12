@@ -55,27 +55,23 @@ public class Util {
 		return false;
 	}
 
-	public static void generalAttack(RobotController rc) throws GameActionException{
-		MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
-		System.out.println("GOAL: " + goal.toString());
-		if (RobotPlayer.coreReady) {
-			if (rc.canAttackLocation(goal)) {
-				System.out.println("can attack goal!: " + goal.toString());
-				rc.attackLocation(goal);
-				return;
-			}
-			RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
-			if (!attack(rc, enemyRobots)) {
-				if (rc.getHealth() < 40) {
-					System.out.println("my health or supply is too low, going to hq");
-					tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
-					return;
-				}
-				System.out.println("moving to goal!: " + goal.toString());
-				tryMove(rc, rc.getLocation().directionTo(goal));
-			}
-		}
-	}
+    public static void generalAttack(RobotController rc) throws GameActionException{
+        MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
+        if (RobotPlayer.coreReady) {
+            if (rc.canAttackLocation(goal)) {
+                rc.attackLocation(goal);
+                return;
+            }
+            RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
+            if (!attack(rc, enemyRobots)) {
+                if (rc.getHealth() < 40) {
+                    tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
+                    return;
+                }
+                tryMove(rc, rc.getLocation().directionTo(goal));
+            }
+        }
+    }
 
 	public static int mapLocToInt(MapLocation m){
 		return (m.x*10000 + m.y);
@@ -401,9 +397,16 @@ public class Util {
 			attackByType(rc, enemiesInRange, targets);
 		}
 
-        // enemies in sight
-        if (enemiesInSight.length > 0 && RobotPlayer.coreReady) {
-            nextMove = kiteDirection(rc, myLocation, enemiesInSight);
+		// enemies in sight
+		if (enemiesInSight.length > 0){
+			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
+			if (nextMove != null){
+				rc.move(nextMove);
+				return true;
+			}
+		} else {
+			moveToLocation(rc, rc.senseEnemyHQLocation());
+		}
 
             if (nextMove != null) {
                 rc.move(nextMove);
@@ -495,4 +498,10 @@ public class Util {
 			rc.attackLocation(target.location);
 		}
 	}
+
+    public static void debug(RobotController rc, String msg) {
+        if (rc.getID() == 34293) {
+            System.out.println("DEBUG: " + msg);
+        }
+    }
 }
