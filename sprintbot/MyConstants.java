@@ -7,4 +7,5 @@ public class MyConstants {
     public static int ALONE_TOWER_INDEX = 66; //stores the index of the tower we want to send launcher to protect
     public static int NUM_POINTS_OF_INTEREST_OFFSET = 60000; // will occupy channel 60000;
     public static int POINTS_OF_INTEREST_OFFSET = 60001; // will occupy channels 60,000 - ?;
+    public static int TOWER_UNDER_DISTRESS = 67; //occupies 67-73
 }

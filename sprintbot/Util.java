@@ -197,7 +197,6 @@ public class Util {
 
 		if(!flee(rc,rc.senseNearbyRobots(rc.getLocation(),24, RobotPlayer.enemyTeam)))
 		{
-			System.out.println("TAINT FLEE");
 			MapLocation myLocation = rc.getLocation();
 			double oreCount = rc.senseOre(myLocation);
 			ArrayList<Integer> OreLocations = new ArrayList<Integer>();
@@ -403,17 +402,17 @@ public class Util {
 		Direction nextMove = null;
 
 		// enemies in range
-		if (enemiesInRange.length > 0 && RobotPlayer.weaponReady){
+		if (enemiesInRange.length > 0 && rc.isWeaponReady()){
 			// shoot targets
 			attackByType(rc, enemiesInRange, targets);
 		}
 
 		// enemies in sight
-		if (enemiesInSight.length > 0){
+		if (enemiesInSight.length > 0 && rc.isCoreReady()){
 			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
-			if (nextMove != null){
+			if (nextMove != null && rc.canMove(nextMove)){
 				rc.move(nextMove);
-				if(RobotPlayer.weaponReady){
+				if (rc.isWeaponReady()){
 					attackByType(rc, enemiesInRange, targets);
 				}
 			}
@@ -486,7 +485,7 @@ public class Util {
 		return dirToMove;
 	}
 	private static void attackByType(RobotController rc, RobotInfo[] enemies, RobotType[] targetTypes) throws GameActionException {
-        if (targetTypes.length == 0) {
+        if (enemies.length == 0) {
             return;
         }
 		RobotInfo target = enemies[0];

@@ -21,6 +21,8 @@ public class LAUNCHER {
             }
             if (atGoal == false) {
                 atGoal = Pathing.straitBuggin(rc, goal);
+            } else {
+                tryLaunch(rc);
             }
         }
     }

@@ -256,4 +256,5 @@ public class HQ {
 		rc.broadcast(MyConstants.ATTACK_LOCATION, closest.x);
 		rc.broadcast(MyConstants.ATTACK_LOCATION + 1, closest.y);
 	}
+	
 }
