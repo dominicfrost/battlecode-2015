@@ -5,6 +5,8 @@ import battlecode.common.*;
 public class HQ {
     public static RobotController rc;
     public static RobotType[] canSpawn = {RobotType.BEAVER};
+    public static Boolean first = true;
+    
     public static void execute(RobotController rc_in) throws GameActionException {
         rc = rc_in;
         int executeStartRound = Clock.getRoundNum();
@@ -12,6 +14,11 @@ public class HQ {
         RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
 
         assessTheSituation();
+        if(first){
+        	setPointsOfInterest(5);
+        	first = false;
+        }
+        
         if (rc.isCoreReady()) {
             if (!Util.attack(rc, enemyRobots)) {
                 Util.spawnWithPrecedence(rc, Direction.NORTH, canSpawn);
@@ -23,7 +30,60 @@ public class HQ {
         }
     }
 
-    /*
+    private static void setPointsOfInterest(int numPoints) throws GameActionException {
+		MapLocation myHq = RobotPlayer.myHq;
+		MapLocation enemyHq = RobotPlayer.enemyHq;
+		MapLocation[] pointsOfInterest = new MapLocation[numPoints];
+		
+		int distX = myHq.x - enemyHq.x;
+		int distY = myHq.y - enemyHq.y;
+		
+		
+		Direction xDir = null;
+		Direction yDir = null;
+		
+		// determine corner points of interest
+		if (distX > 0){
+			xDir = Direction.EAST;
+		} else {
+			xDir = Direction.WEST;
+		}	
+		if (distY > 0){
+			yDir = Direction.NORTH;
+		} else {
+			yDir = Direction.SOUTH;
+		}
+		
+		// how close we want the point to be to enemy location relative to map size
+		double pointProximity = 3 / 5;
+		// Corner Locations
+		MapLocation xCorner = myHq.add(xDir, (int)(distX * pointProximity));
+		MapLocation yCorner = myHq.add(yDir, (int)(distY * pointProximity)); 
+		
+		int finalXLine = (int)(Math.sqrt(xCorner.distanceSquaredTo(enemyHq)) / 2);
+		int finalYLine = (int)(Math.sqrt(xCorner.distanceSquaredTo(enemyHq)) / 2);
+
+		// save and transmit locations
+		pointsOfInterest[0] = xCorner;
+		pointsOfInterest[1] = yCorner;
+		
+		for (int i = 0; i < numPoints - 2; i++){
+			double incProp = (1 / (numPoints - 1));
+			
+			int xCoordinate = (int)(i * (incProp) * finalXLine);
+			int yCoordinate = (int)(1 - (incProp)* finalYLine);
+			
+			MapLocation nextPoint = new MapLocation(xCoordinate, yCoordinate); 
+			pointsOfInterest[i + 2] = nextPoint;
+		}
+		
+		for (int i = 0; i < numPoints; i++){
+			rc.broadcast(MyConstants.POINTS_OR_INTEREST_OFFSET + (3 * i), pointsOfInterest[i].x);
+			rc.broadcast(MyConstants.POINTS_OR_INTEREST_OFFSET + (3 * i + 1), pointsOfInterest[i].y);
+		}
+	}
+
+	/*
      * counts how many of each type of robot there are on the given team
      */
     public static int[] countTypes(RobotInfo[] myRobots) throws GameActionException {
@@ -144,6 +204,10 @@ public class HQ {
         remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, 1);
         if (remainingOre < 0) return;
         remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 1, remainingOre, 3);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, 1);
         if (remainingOre < 0) return;
         remainingOre = spawningRule(allyTypeCount, RobotType.BARRACKS, 1, remainingOre, 3);
         if (remainingOre < 0) return;
