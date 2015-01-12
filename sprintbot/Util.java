@@ -107,13 +107,16 @@ public class Util {
         }
     }
 
-    public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation,  MapLocation[] enemyTowers, MapLocation enemyHq) {
-        if (myLocation.distanceSquaredTo(enemyHq) <= 35) {
+    public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation) {
+    	MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+    	MapLocation enemyHQ = rc.senseEnemyHQLocation();
+    	
+        if (myLocation.distanceSquaredTo(enemyHQ) <= RobotType.HQ.attackRadiusSquared) {
             return false;
         }
 
         for (MapLocation tower: enemyTowers) {
-            if (myLocation.distanceSquaredTo(tower) <= 24) {
+            if (myLocation.distanceSquaredTo(tower) <=  RobotType.TOWER.attackRadiusSquared) {
                 return false;
             }
         }
@@ -398,21 +401,15 @@ public class Util {
 		if (enemiesInRange.length > 0){
 			// shoot targets
 			attackByType(rc, enemiesInRange, targets);
-            return true;
 		}
 
 		// enemies in sight
 		if (enemiesInSight.length > 0){
-			Boolean safe = true;
 
 			// can any of these guys hit me?
 			for (RobotInfo enemy : enemiesInSight){
 				int enemyRange = enemy.type.attackRadiusSquared;
 				int distanceFromEnemy = myLocation.distanceSquaredTo(enemy.location);
-
-				if (enemyRange >= distanceFromEnemy){
-					safe = false;
-				}
 			}
 			// kite
 			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
@@ -435,11 +432,18 @@ public class Util {
 		int myRange = rc.getType().attackRadiusSquared;
 		double[] squareValues = new double[8];
 		double lowestVal = 0.0;
+		Boolean safeToMove = true;
 
 		// base case
 		for (RobotInfo enemy : enemiesInSight){
 			int enemyRange = enemy.type.attackRadiusSquared;
 			int distanceFromEnemy = baseSquare.distanceSquaredTo(enemy.location);
+			
+			// if in range of HQ or enemy Towers
+			safeToMove = safeToMoveTo(rc, baseSquare);
+			if(!safeToMove){
+				lowestVal += (2 * RobotType.TOWER.attackPower);
+			}
 
 			// if an enemy can hit me, add 2 * its damage to this square
 			if (enemyRange >= distanceFromEnemy){
@@ -462,11 +466,19 @@ public class Util {
 				if (enemyRange >= distanceFromEnemy){
 					squareValues[index] += (2 * enemy.type.attackPower);
 				}
+				safeToMove = safeToMoveTo(rc, baseSquare.add(dir));
+				if(!safeToMove){
+					lowestVal += (2 * RobotType.TOWER.attackPower);
+					squareValues[index] += (2 * RobotType.TOWER.attackPower);
+				}
 				// if I can hit an enemy, add 1 * my damage to this square
 				if (distanceFromEnemy <= myRange){
 					squareValues[index] -= (rc.getType().attackPower);
 				}
 			}
+			
+			
+			
 			// if this direction is safer than last one, set to move there
 			if (squareValues[index] <= lowestVal && rc.canMove(dir)){
 				lowestVal = squareValues[index];
