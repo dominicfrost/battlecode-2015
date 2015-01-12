@@ -19,8 +19,8 @@ public class RobotPlayer {
         rand = new Random(rc.getID());
         enemyHq = rc.senseEnemyHQLocation();
         enemyTowers = rc.senseEnemyTowerLocations();
-        myHq = rc.senseEnemyHQLocation();
-        myTowers = rc.senseEnemyTowerLocations();
+        myHq = rc.senseHQLocation();
+        myTowers = rc.senseTowerLocations();
 
 		while(true) {
 
