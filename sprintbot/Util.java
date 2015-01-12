@@ -5,390 +5,390 @@ import battlecode.common.*;
 import java.util.*;
 
 public class Util {
-    public static Random rand = new Random();
-    public static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+	public static Random rand = new Random();
+	public static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 
 
-    /*
-     * spawns the current spawn type if possible
-     */
-    public static boolean buildWithPrecedence(RobotController rc, Direction d, RobotType[] canBuild) throws GameActionException{
-        if (!rc.isCoreReady()) {
-            return false;
-        }
+	/*
+	 * spawns the current spawn type if possible
+	 */
+	public static boolean buildWithPrecedence(RobotController rc, Direction d, RobotType[] canBuild) throws GameActionException{
+		if (!rc.isCoreReady()) {
+			return false;
+		}
 
-        int numToBuild;
-        double myOre = rc.getTeamOre();
+		int numToBuild;
+		double myOre = rc.getTeamOre();
 
-        for (RobotType type: canBuild) {
-            numToBuild = rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal());
-            if (numToBuild > 0 && myOre >= type.oreCost) {
-                tryBuild(rc, d, type);
-                numToBuild--;
-                rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToBuild);
-                return true;
-            }
-        }
-        return false;
-    }
+		for (RobotType type: canBuild) {
+			numToBuild = rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal());
+			if (numToBuild > 0 && myOre >= type.oreCost) {
+				tryBuild(rc, d, type);
+				numToBuild--;
+				rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToBuild);
+				return true;
+			}
+		}
+		return false;
+	}
 
-    /*
-     * spawns the current spawn type if possible
-     */
-    public static boolean spawnWithPrecedence(RobotController rc, Direction d, RobotType[] canSpawn) throws GameActionException{
-        if (!rc.isCoreReady()) {
-            return false;
-        }
+	/*
+	 * spawns the current spawn type if possible
+	 */
+	public static boolean spawnWithPrecedence(RobotController rc, Direction d, RobotType[] canSpawn) throws GameActionException{
+		if (!rc.isCoreReady()) {
+			return false;
+		}
 
-        int numToSpawn;
-        double myOre = rc.getTeamOre();
+		int numToSpawn;
+		double myOre = rc.getTeamOre();
 
-        for (RobotType type: canSpawn) {
-            numToSpawn = rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal());
-            if (numToSpawn > 0 && myOre >= type.oreCost) {
-                trySpawn(rc, d, type);
-                numToSpawn--;
-                rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToSpawn);
-                return true;
-            }
-        }
-        return false;
-    }
+		for (RobotType type: canSpawn) {
+			numToSpawn = rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal());
+			if (numToSpawn > 0 && myOre >= type.oreCost) {
+				trySpawn(rc, d, type);
+				numToSpawn--;
+				rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToSpawn);
+				return true;
+			}
+		}
+		return false;
+	}
 
-    public static void generalAttack(RobotController rc) throws GameActionException{
-        MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
-        System.out.println("GOAL: " + goal.toString());
-        if (rc.isCoreReady()) {
-            if (rc.canAttackLocation(goal)) {
-                System.out.println("can attack goal!: " + goal.toString());
-                rc.attackLocation(goal);
-                return;
-            }
-            RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
-            if (!attack(rc, enemyRobots)) {
-                if (rc.getHealth() < 40) {
-                    System.out.println("my health or supply is too low, going to hq");
-                    tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
-                    return;
-                }
-                System.out.println("moving to goal!: " + goal.toString());
-                tryMove(rc, rc.getLocation().directionTo(goal));
-            }
-        }
-    }
+	public static void generalAttack(RobotController rc) throws GameActionException{
+		MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
+		System.out.println("GOAL: " + goal.toString());
+		if (rc.isCoreReady()) {
+			if (rc.canAttackLocation(goal)) {
+				System.out.println("can attack goal!: " + goal.toString());
+				rc.attackLocation(goal);
+				return;
+			}
+			RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
+			if (!attack(rc, enemyRobots)) {
+				if (rc.getHealth() < 40) {
+					System.out.println("my health or supply is too low, going to hq");
+					tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
+					return;
+				}
+				System.out.println("moving to goal!: " + goal.toString());
+				tryMove(rc, rc.getLocation().directionTo(goal));
+			}
+		}
+	}
 
-    public static int mapLocToInt(MapLocation m){
-        return (m.x*10000 + m.y);
-    }
+	public static int mapLocToInt(MapLocation m){
+		return (m.x*10000 + m.y);
+	}
 
-    public static MapLocation intToMapLoc(int i){
-        return new MapLocation(i/10000,i%10000);
-    }
+	public static MapLocation intToMapLoc(int i){
+		return new MapLocation(i/10000,i%10000);
+	}
 
-    // This method will attempt to move in Direction d (or as close to it as possible)
-    public static void tryMove(RobotController rc, Direction d) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2};
-        int dirint = directionToInt(d);
-        boolean blocked = false;
-        while (offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
-            offsetIndex++;
-        }
-        if (offsetIndex < 5) {
-            rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
-        }
-    }
+	// This method will attempt to move in Direction d (or as close to it as possible)
+	public static void tryMove(RobotController rc, Direction d) throws GameActionException {
+		int offsetIndex = 0;
+		int[] offsets = {0,1,-1,2,-2};
+		int dirint = directionToInt(d);
+		boolean blocked = false;
+		while (offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
+			offsetIndex++;
+		}
+		if (offsetIndex < 5) {
+			rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
+		}
+	}
 
-    // This method will attack an enemy in sight, if there is one
-    public static void attackSomething(RobotController rc, int myRange, Team enemyTeam) throws GameActionException {
-        RobotInfo[] enemies = rc.senseNearbyRobots(myRange, enemyTeam);
-        if (enemies.length > 0) {
-            rc.attackLocation(enemies[0].location);
-        }
-    }
+	// This method will attack an enemy in sight, if there is one
+	public static void attackSomething(RobotController rc, int myRange, Team enemyTeam) throws GameActionException {
+		RobotInfo[] enemies = rc.senseNearbyRobots(myRange, enemyTeam);
+		if (enemies.length > 0) {
+			rc.attackLocation(enemies[0].location);
+		}
+	}
 
-    public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation) {
-    	MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-    	MapLocation enemyHQ = rc.senseEnemyHQLocation();
-    	
-        if (myLocation.distanceSquaredTo(enemyHQ) <= RobotType.HQ.attackRadiusSquared) {
-            return false;
-        }
+	public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation) {
+		MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+		MapLocation enemyHQ = rc.senseEnemyHQLocation();
 
-        for (MapLocation tower: enemyTowers) {
-            if (myLocation.distanceSquaredTo(tower) <=  RobotType.TOWER.attackRadiusSquared) {
-                return false;
-            }
-        }
+		if (myLocation.distanceSquaredTo(enemyHQ) <= RobotType.HQ.attackRadiusSquared) {
+			return false;
+		}
 
-        return true;
-    }
+		for (MapLocation tower: enemyTowers) {
+			if (myLocation.distanceSquaredTo(tower) <=  RobotType.TOWER.attackRadiusSquared) {
+				return false;
+			}
+		}
 
-    // This function will try to move to a given location. It will move around enemy towers and HQ.
-    public static void moveToLocation(RobotController rc, MapLocation goal) throws GameActionException {
-        MapLocation myLocation = rc.getLocation();
-        Direction goalDir = myLocation.directionTo(goal);
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2};
-        int dirint = directionToInt(goalDir);
+		return true;
+	}
 
-        masterLoop: for (int i = 0; i < offsets.length; i++) {
-            Direction targetDir = directions[(dirint+offsets[i]+8)%8];
-            if (!rc.canMove(targetDir)) {
-                //continue in loop if we cant move to the target location
-                continue;
-            }
-            MapLocation targetLocation = myLocation.add(targetDir);
-            for (int j = 0, len = RobotPlayer.enemyTowers.length; j < len; j++) {
-                MapLocation towerLocation = RobotPlayer.enemyTowers[j];
-                if (targetLocation.distanceSquaredTo(towerLocation) <= 24) {
-                    // continue in loop if the location is within range of an enemy tower
-                    continue masterLoop;
-                }
-            }
+	// This function will try to move to a given location. It will move around enemy towers and HQ.
+	public static void moveToLocation(RobotController rc, MapLocation goal) throws GameActionException {
+		MapLocation myLocation = rc.getLocation();
+		Direction goalDir = myLocation.directionTo(goal);
+		int offsetIndex = 0;
+		int[] offsets = {0,1,-1,2,-2};
+		int dirint = directionToInt(goalDir);
 
-            if (targetLocation.distanceSquaredTo(RobotPlayer.enemyHq) <= 35) {
-                // continue in loop if the location is within range of an enemy HQ
-                continue;
-            }
+		masterLoop: for (int i = 0; i < offsets.length; i++) {
+			Direction targetDir = directions[(dirint+offsets[i]+8)%8];
+			if (!rc.canMove(targetDir)) {
+				//continue in loop if we cant move to the target location
+				continue;
+			}
+			MapLocation targetLocation = myLocation.add(targetDir);
+			for (int j = 0, len = RobotPlayer.enemyTowers.length; j < len; j++) {
+				MapLocation towerLocation = RobotPlayer.enemyTowers[j];
+				if (targetLocation.distanceSquaredTo(towerLocation) <= 24) {
+					// continue in loop if the location is within range of an enemy tower
+					continue masterLoop;
+				}
+			}
 
-            // we can move to the target location if we have made it this far.
-            rc.move(targetDir);
-            break;
-        }
-    }
+			if (targetLocation.distanceSquaredTo(RobotPlayer.enemyHq) <= 35) {
+				// continue in loop if the location is within range of an enemy HQ
+				continue;
+			}
 
-    // This method will attempt to build in the given direction (or as close to it as possible)
-    public static void tryBuild(RobotController rc, Direction d, RobotType type) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2,3,-3,4};
-        int dirint = directionToInt(d);
-        boolean blocked = false;
-        while (offsetIndex < 8 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
-            offsetIndex++;
-        }
-        if (offsetIndex < 8) {
-            rc.build(directions[(dirint+offsets[offsetIndex]+8)%8], type);
-        }
-    }
-    
-    //use this to return the map location in a specific direction from your robot
-    public static MapLocation getAdjacentLocation(RobotController rc, Direction dir, MapLocation loc){
-    	return (loc.add(dir));
-    }
-    
-    
-    
-    //prefer adjacent tiles with more ore
-    //compare ore at current location to ore at all adjacent tiles
-    //move to the most fruitful tile, unless there are several w/ same amount, then pick one of them at random
-    //frig
-    public static void SmartMine(RobotController rc) throws GameActionException {
-        if (!rc.isCoreReady()) {
-            return;
-        }
-        
-        if(!flee(rc,rc.senseNearbyRobots(rc.getLocation(),24, RobotPlayer.enemyTeam)))
-        {
-        	System.out.println("TAINT FLEE");
-	        MapLocation myLocation = rc.getLocation();
-	        double oreCount = rc.senseOre(myLocation);
-	        ArrayList<Integer> OreLocations = new ArrayList<Integer>();
-	        
-	        double ore_N = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH, myLocation));
-	        double ore_NE = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_EAST, myLocation));
-	        double ore_E = rc.senseOre(getAdjacentLocation(rc, Direction.EAST, myLocation));
-	        double ore_SE = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH_EAST, myLocation));
-	        double ore_S = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH, myLocation));
-	        double ore_SW = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH_WEST, myLocation));
-	        double ore_W = rc.senseOre(getAdjacentLocation(rc, Direction.WEST, myLocation));
-	        double ore_NW = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_WEST, myLocation));
-	        
-	        
-	        if(oreCount < ore_N)
-	        	OreLocations.add(1);
-	        if(oreCount < ore_NE)
-	        	OreLocations.add(2);
-	        if(oreCount < ore_E)
-	        	OreLocations.add(3);
-	        if(oreCount < ore_SE)
-	        	OreLocations.add(4);
-	        if(oreCount < ore_S)
-	        	OreLocations.add(5);
-	        if(oreCount < ore_SW)
-	        	OreLocations.add(6);
-	        if(oreCount < ore_W)
-	        	OreLocations.add(7);
-	        if(oreCount < ore_NW)
-	        	OreLocations.add(8);
-	        
-	        if(OreLocations.size() == 0)
-	        	if (oreCount > 0)
-	        		rc.mine();
-	        	else
-	        		tryMove(rc, Util.intToDirection(RobotPlayer.rand.nextInt(8)));
-	        else {
-	        	int pick = RobotPlayer.rand.nextInt(OreLocations.size());
-	        	Util.tryMove(rc, intToDirection((int) OreLocations.get(pick)));
-	        }
-        }
-    }
+			// we can move to the target location if we have made it this far.
+			rc.move(targetDir);
+			break;
+		}
+	}
 
-    // mine like a dummy
-    public static void mine(RobotController rc) throws GameActionException {
-        if (!rc.isCoreReady()) {
-            return;
-        }
+	// This method will attempt to build in the given direction (or as close to it as possible)
+	public static void tryBuild(RobotController rc, Direction d, RobotType type) throws GameActionException {
+		int offsetIndex = 0;
+		int[] offsets = {0,1,-1,2,-2,3,-3,4};
+		int dirint = directionToInt(d);
+		boolean blocked = false;
+		while (offsetIndex < 8 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
+			offsetIndex++;
+		}
+		if (offsetIndex < 8) {
+			rc.build(directions[(dirint+offsets[offsetIndex]+8)%8], type);
+		}
+	}
 
-        MapLocation myLocation = rc.getLocation();
-        double oreCount = rc.senseOre(myLocation);
-        if (oreCount > 0) {
-            rc.mine();
-        }else {
-            int fate = rand.nextInt(8);
-            Util.tryMove(rc, Util.intToDirection(fate));
-        }
-    }
-
-    public static Direction intToDirection(int i) {
-        switch(i) {
-            case 0:
-                return Direction.NORTH;
-            case 1:
-                return Direction.NORTH_EAST;
-            case 2:
-                return Direction.EAST;
-            case 3:
-                return Direction.SOUTH_EAST;
-            case 4:
-                return Direction.SOUTH;
-            case 5:
-                return Direction.SOUTH_WEST;
-            case 6:
-                return Direction.WEST;
-            case 7:
-                return Direction.NORTH_WEST;
-            default:
-                return Direction.NORTH;
-        }
-    }
-
-    public static int directionToInt(Direction d) {
-        switch(d) {
-            case NORTH:
-                return 0;
-            case NORTH_EAST:
-                return 1;
-            case EAST:
-                return 2;
-            case SOUTH_EAST:
-                return 3;
-            case SOUTH:
-                return 4;
-            case SOUTH_WEST:
-                return 5;
-            case WEST:
-                return 6;
-            case NORTH_WEST:
-                return 7;
-            default:
-                return 0;
-        }
-    }
-
-    public static boolean flee(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
-        ArrayDeque<MapLocation> enemieLocs = new ArrayDeque<MapLocation>();
-        for (RobotInfo robot: enemyRobots) {
-            if (robot.type.attackRadiusSquared <= robot.location.distanceSquaredTo(rc.getLocation())) {
-                enemieLocs.add(robot.location);
-            }
-        }
-        if (enemieLocs.size() > 0) {
-            int counterx = 0;
-            int countery = 0;
-            for (MapLocation oppLoc : enemieLocs) {
-                counterx += oppLoc.x;
-                countery += oppLoc.y;
-            }
-
-            MapLocation avg = new MapLocation(counterx / enemieLocs.size(), countery / enemieLocs.size());
-            Direction dirToGoal = rc.getLocation().directionTo(avg).opposite();
-            tryMove(rc, dirToGoal);
-            return true;
-        }
-
-        return false;
-    }
-
-    public static int[] getRobotCount(RobotController rc) throws GameActionException{
-        int[] robotCount = new int[21];
-        for (int i = 0; i < robotCount.length; i++) {
-            robotCount[i] = rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + i);
-        }
-
-        return robotCount;
-    }
-
-    public static RobotType getRobotTypeToSpawn(RobotController rc) throws GameActionException{
-        RobotType[] types = RobotType.values();
-        return types[rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET)];
-    }
-
-    // This method will attempt to spawn in the given direction (or as close to it as possible)
-    public static void trySpawn(RobotController rc, Direction d, RobotType type) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2,3,-3,4};
-        int dirint = Util.directionToInt(d);
-        boolean blocked = false;
-        while (offsetIndex < 8 && !rc.canSpawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
-            offsetIndex++;
-        }
-        if (offsetIndex < 8) {
-            rc.spawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type);
-        }
-    }
+	//use this to return the map location in a specific direction from your robot
+	public static MapLocation getAdjacentLocation(RobotController rc, Direction dir, MapLocation loc){
+		return (loc.add(dir));
+	}
 
 
-    public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
-        if (rc.isWeaponReady() && enemyRobots.length > 0) {
-            MapLocation myLocation = rc.getLocation();
-            RobotInfo toAttack = enemyRobots[0];
-            int closest = Integer.MAX_VALUE;
 
-            for (RobotInfo enemy : enemyRobots) {
-                int distanceToEnemy = myLocation.distanceSquaredTo(enemy.location);
-                if (distanceToEnemy < closest) {
-                    closest = distanceToEnemy;
-                    toAttack = enemy;
-                } else if (distanceToEnemy == closest) {
-                    if (enemy.health < toAttack.health) {
-                        toAttack = enemy;
-                    }
-                }
-            }
+	//prefer adjacent tiles with more ore
+	//compare ore at current location to ore at all adjacent tiles
+	//move to the most fruitful tile, unless there are several w/ same amount, then pick one of them at random
+	//frig
+	public static void SmartMine(RobotController rc) throws GameActionException {
+		if (!rc.isCoreReady()) {
+			return;
+		}
 
-            if (rc.canAttackLocation(toAttack.location)) {
-                rc.attackLocation(toAttack.location);
-                return true;
-            }
-        }
-        return false;
-    }
-    public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) {
-        Direction dirToGoal;
-        ArrayList<MapLocation> mLine = new ArrayList<MapLocation>();
-        MapLocation previousLocation = rc.getLocation();
+		if(!flee(rc,rc.senseNearbyRobots(rc.getLocation(),24, RobotPlayer.enemyTeam)))
+		{
+			System.out.println("TAINT FLEE");
+			MapLocation myLocation = rc.getLocation();
+			double oreCount = rc.senseOre(myLocation);
+			ArrayList<Integer> OreLocations = new ArrayList<Integer>();
 
-        while (!previousLocation.equals(goal)) {
-            mLine.add(previousLocation);
-            dirToGoal = previousLocation.directionTo(goal);
-            previousLocation = previousLocation.add(dirToGoal);
-        }
+			double ore_N = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH, myLocation));
+			double ore_NE = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_EAST, myLocation));
+			double ore_E = rc.senseOre(getAdjacentLocation(rc, Direction.EAST, myLocation));
+			double ore_SE = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH_EAST, myLocation));
+			double ore_S = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH, myLocation));
+			double ore_SW = rc.senseOre(getAdjacentLocation(rc, Direction.SOUTH_WEST, myLocation));
+			double ore_W = rc.senseOre(getAdjacentLocation(rc, Direction.WEST, myLocation));
+			double ore_NW = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_WEST, myLocation));
 
-        return mLine;
-    }
-    
-    public static boolean harass(RobotController rc, RobotType[] targets) throws GameActionException {
+
+			if(oreCount < ore_N)
+				OreLocations.add(1);
+			if(oreCount < ore_NE)
+				OreLocations.add(2);
+			if(oreCount < ore_E)
+				OreLocations.add(3);
+			if(oreCount < ore_SE)
+				OreLocations.add(4);
+			if(oreCount < ore_S)
+				OreLocations.add(5);
+			if(oreCount < ore_SW)
+				OreLocations.add(6);
+			if(oreCount < ore_W)
+				OreLocations.add(7);
+			if(oreCount < ore_NW)
+				OreLocations.add(8);
+
+			if(OreLocations.size() == 0)
+				if (oreCount > 0)
+					rc.mine();
+				else
+					tryMove(rc, Util.intToDirection(RobotPlayer.rand.nextInt(8)));
+			else {
+				int pick = RobotPlayer.rand.nextInt(OreLocations.size());
+				Util.tryMove(rc, intToDirection((int) OreLocations.get(pick)));
+			}
+		}
+	}
+
+	// mine like a dummy
+	public static void mine(RobotController rc) throws GameActionException {
+		if (!rc.isCoreReady()) {
+			return;
+		}
+
+		MapLocation myLocation = rc.getLocation();
+		double oreCount = rc.senseOre(myLocation);
+		if (oreCount > 0) {
+			rc.mine();
+		}else {
+			int fate = rand.nextInt(8);
+			Util.tryMove(rc, Util.intToDirection(fate));
+		}
+	}
+
+	public static Direction intToDirection(int i) {
+		switch(i) {
+		case 0:
+			return Direction.NORTH;
+		case 1:
+			return Direction.NORTH_EAST;
+		case 2:
+			return Direction.EAST;
+		case 3:
+			return Direction.SOUTH_EAST;
+		case 4:
+			return Direction.SOUTH;
+		case 5:
+			return Direction.SOUTH_WEST;
+		case 6:
+			return Direction.WEST;
+		case 7:
+			return Direction.NORTH_WEST;
+		default:
+			return Direction.NORTH;
+		}
+	}
+
+	public static int directionToInt(Direction d) {
+		switch(d) {
+		case NORTH:
+			return 0;
+		case NORTH_EAST:
+			return 1;
+		case EAST:
+			return 2;
+		case SOUTH_EAST:
+			return 3;
+		case SOUTH:
+			return 4;
+		case SOUTH_WEST:
+			return 5;
+		case WEST:
+			return 6;
+		case NORTH_WEST:
+			return 7;
+		default:
+			return 0;
+		}
+	}
+
+	public static boolean flee(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
+		ArrayDeque<MapLocation> enemieLocs = new ArrayDeque<MapLocation>();
+		for (RobotInfo robot: enemyRobots) {
+			if (robot.type.attackRadiusSquared <= robot.location.distanceSquaredTo(rc.getLocation())) {
+				enemieLocs.add(robot.location);
+			}
+		}
+		if (enemieLocs.size() > 0) {
+			int counterx = 0;
+			int countery = 0;
+			for (MapLocation oppLoc : enemieLocs) {
+				counterx += oppLoc.x;
+				countery += oppLoc.y;
+			}
+
+			MapLocation avg = new MapLocation(counterx / enemieLocs.size(), countery / enemieLocs.size());
+			Direction dirToGoal = rc.getLocation().directionTo(avg).opposite();
+			tryMove(rc, dirToGoal);
+			return true;
+		}
+
+		return false;
+	}
+
+	public static int[] getRobotCount(RobotController rc) throws GameActionException{
+		int[] robotCount = new int[21];
+		for (int i = 0; i < robotCount.length; i++) {
+			robotCount[i] = rc.readBroadcast(MyConstants.ROBOT_COUNT_OFFSET + i);
+		}
+
+		return robotCount;
+	}
+
+	public static RobotType getRobotTypeToSpawn(RobotController rc) throws GameActionException{
+		RobotType[] types = RobotType.values();
+		return types[rc.readBroadcast(MyConstants.SPAWN_TYPE_OFFSET)];
+	}
+
+	// This method will attempt to spawn in the given direction (or as close to it as possible)
+	public static void trySpawn(RobotController rc, Direction d, RobotType type) throws GameActionException {
+		int offsetIndex = 0;
+		int[] offsets = {0,1,-1,2,-2,3,-3,4};
+		int dirint = Util.directionToInt(d);
+		boolean blocked = false;
+		while (offsetIndex < 8 && !rc.canSpawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
+			offsetIndex++;
+		}
+		if (offsetIndex < 8) {
+			rc.spawn(Util.directions[(dirint+offsets[offsetIndex]+8)%8], type);
+		}
+	}
+
+
+	public static boolean attack(RobotController rc, RobotInfo[] enemyRobots) throws GameActionException{
+		if (rc.isWeaponReady() && enemyRobots.length > 0) {
+			MapLocation myLocation = rc.getLocation();
+			RobotInfo toAttack = enemyRobots[0];
+			int closest = Integer.MAX_VALUE;
+
+			for (RobotInfo enemy : enemyRobots) {
+				int distanceToEnemy = myLocation.distanceSquaredTo(enemy.location);
+				if (distanceToEnemy < closest) {
+					closest = distanceToEnemy;
+					toAttack = enemy;
+				} else if (distanceToEnemy == closest) {
+					if (enemy.health < toAttack.health) {
+						toAttack = enemy;
+					}
+				}
+			}
+
+			if (rc.canAttackLocation(toAttack.location)) {
+				rc.attackLocation(toAttack.location);
+				return true;
+			}
+		}
+		return false;
+	}
+	public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) {
+		Direction dirToGoal;
+		ArrayList<MapLocation> mLine = new ArrayList<MapLocation>();
+		MapLocation previousLocation = rc.getLocation();
+
+		while (!previousLocation.equals(goal)) {
+			mLine.add(previousLocation);
+			dirToGoal = previousLocation.directionTo(goal);
+			previousLocation = previousLocation.add(dirToGoal);
+		}
+
+		return mLine;
+	}
+
+	public static boolean harass(RobotController rc, RobotType[] targets) throws GameActionException {
 		MapLocation myLocation = rc.getLocation();
 		int sensorRange = rc.getType().sensorRadiusSquared;
 		int attackRange = rc.getType().attackRadiusSquared;
@@ -405,17 +405,10 @@ public class Util {
 
 		// enemies in sight
 		if (enemiesInSight.length > 0){
-
-			// can any of these guys hit me?
-			for (RobotInfo enemy : enemiesInSight){
-				int enemyRange = enemy.type.attackRadiusSquared;
-				int distanceFromEnemy = myLocation.distanceSquaredTo(enemy.location);
-			}
-			// kite
 			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
 			if (nextMove != null){
 				rc.move(nextMove);
-                return true;
+				return true;
 			}
 		} else {
 			moveToLocation(rc, rc.senseEnemyHQLocation());
@@ -435,15 +428,15 @@ public class Util {
 		Boolean safeToMove = true;
 
 		// base case
+		// if in range of HQ or enemy Towers
+		safeToMove = safeToMoveTo(rc, baseSquare);
+		if(!safeToMove){
+			lowestVal += (2 * RobotType.TOWER.attackPower);
+		}
+
 		for (RobotInfo enemy : enemiesInSight){
 			int enemyRange = enemy.type.attackRadiusSquared;
 			int distanceFromEnemy = baseSquare.distanceSquaredTo(enemy.location);
-			
-			// if in range of HQ or enemy Towers
-			safeToMove = safeToMoveTo(rc, baseSquare);
-			if(!safeToMove){
-				lowestVal += (2 * RobotType.TOWER.attackPower);
-			}
 
 			// if an enemy can hit me, add 2 * its damage to this square
 			if (enemyRange >= distanceFromEnemy){
@@ -451,7 +444,7 @@ public class Util {
 			}
 			// if I can hit an enemy, add 1 * my damage to this square
 			if (distanceFromEnemy <= myRange){
-				lowestVal -= (rc.getType().attackPower);
+				lowestVal -= 1;
 			}
 		}
 
@@ -468,17 +461,13 @@ public class Util {
 				}
 				safeToMove = safeToMoveTo(rc, baseSquare.add(dir));
 				if(!safeToMove){
-					lowestVal += (2 * RobotType.TOWER.attackPower);
 					squareValues[index] += (2 * RobotType.TOWER.attackPower);
 				}
 				// if I can hit an enemy, add 1 * my damage to this square
 				if (distanceFromEnemy <= myRange){
-					squareValues[index] -= (rc.getType().attackPower);
+					squareValues[index] -= 1;
 				}
 			}
-			
-			
-			
 			// if this direction is safer than last one, set to move there
 			if (squareValues[index] <= lowestVal && rc.canMove(dir)){
 				lowestVal = squareValues[index];
