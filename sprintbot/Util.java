@@ -107,40 +107,6 @@ public class Util {
         }
     }
 
-    // This function will try to move to a given location. It will move around enemy towers and HQ.
-    public static void moveToLocation(RobotController rc, MapLocation goal) throws GameActionException {
-        MapLocation myLocation = rc.getLocation();
-        Direction goalDir = myLocation.directionTo(goal);
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2};
-        int dirint = directionToInt(goalDir);
-
-        masterLoop: for (int i = 0; i < offsets.length; i++) {
-            Direction targetDir = directions[(dirint+offsets[i]+8)%8];
-            if (!rc.canMove(targetDir)) {
-                //continue in loop if we cant move to the target location
-                continue;
-            }
-            MapLocation targetLocation = myLocation.add(targetDir);
-            for (int j = 0, len = RobotPlayer.enemyTowers.length; j < len; j++) {
-                MapLocation towerLocation = RobotPlayer.enemyTowers[j];
-                if (targetLocation.distanceSquaredTo(towerLocation) <= 24) {
-                    // continue in loop if the location is within range of an enemy tower
-                    continue masterLoop;
-                }
-            }
-
-            if (targetLocation.distanceSquaredTo(RobotPlayer.enemyHq) <= 35) {
-                // continue in loop if the location is within range of an enemy HQ
-                continue;
-            }
-
-            // we can move to the target location if we have made it this far.
-            rc.move(targetDir);
-            break;
-        }
-    }
-
     public static boolean saftToMoveTo(RobotController rc, MapLocation myLocation,  MapLocation[] enemyTowers, MapLocation enemyHq) {
         if (myLocation.distanceSquaredTo(enemyHq) <= 35) {
             return false;
@@ -190,7 +156,7 @@ public class Util {
         	System.out.println("TAINT FLEE");
 	        MapLocation myLocation = rc.getLocation();
 	        double oreCount = rc.senseOre(myLocation);
-	        ArrayList OreLocations = new ArrayList();
+	        ArrayList<Integer> OreLocations = new ArrayList<Integer>();
 	        
 	        double ore_N = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH, myLocation));
 	        double ore_NE = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_EAST, myLocation));
@@ -230,8 +196,6 @@ public class Util {
 	        }
         }
     }
-    
-    
 
     // mine like a dummy
     public static void mine(RobotController rc) throws GameActionException {
@@ -387,7 +351,7 @@ public class Util {
         return mLine;
     }
     
-    public static void harass(RobotController rc, RobotType[] targets) throws GameActionException {
+    public static boolean harass(RobotController rc, RobotType[] targets) throws GameActionException {
 		MapLocation myLocation = rc.getLocation();
 		int sensorRange = rc.getType().sensorRadiusSquared;
 		int attackRange = rc.getType().attackRadiusSquared;
@@ -400,6 +364,7 @@ public class Util {
 		if (enemiesInRange.length > 0){
 			// shoot targets
 			attackByType(rc, enemiesInRange, targets);
+            return true;
 		}
 
 		// enemies in sight
@@ -419,16 +384,19 @@ public class Util {
 			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
 			if (nextMove != null){
 				rc.move(nextMove);
+                return true;
 			}
 		} else {
-			moveToLocation(rc, rc.senseEnemyHQLocation());
+			rc.move(moveToLocation(rc, rc.senseEnemyHQLocation()));
 		}
 
-		// enemies in range
-		if (enemiesInRange.length > 0){
-			// shoot targets
-			attackByType(rc, enemiesInRange, targets);
-		}
+		return false;
+	}
+
+
+	private static Direction moveToLocation(RobotController rc, MapLocation loc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	// Assign a value to all surrounding squares. The square with the lowest value is returned, directions towards

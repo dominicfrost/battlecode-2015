@@ -4,12 +4,12 @@ import battlecode.common.*;
 
 public class DRONE {
 	public static RobotController rc;
+    public static RobotType[] targets = {RobotType.BEAVER, RobotType.MINER,
+            RobotType.SOLDIER, RobotType.BASHER};
 
 	public static void execute(RobotController rc_in) throws GameActionException {
 		rc = rc_in;
 
-		RobotType[] targets = {RobotType.BEAVER, RobotType.MINER, 
-				RobotType.SOLDIER, RobotType.BASHER};
 		Boolean hunting = false;
 		Boolean supplying = false;
 		double supplyLevel = rc.getSupplyLevel();
