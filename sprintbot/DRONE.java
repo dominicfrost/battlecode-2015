@@ -7,7 +7,6 @@ public class DRONE {
 
 	public static void execute(RobotController rc_in) throws GameActionException {
 		rc = rc_in;
-		int executeStartRound = Clock.getRoundNum();
 
 		RobotType[] targets = {RobotType.BEAVER, RobotType.MINER, 
 				RobotType.SOLDIER, RobotType.BASHER};
@@ -15,12 +14,12 @@ public class DRONE {
 		Boolean supplying = false;
 		double supplyLevel = rc.getSupplyLevel();
 
-		if (rc.isCoreReady()){
-			Util.harass(rc, targets);
-		}
-
-		if (executeStartRound == Clock.getRoundNum()) {
-			rc.yield();
+		if (rc.isCoreReady()) {
+			if (supplyLevel < 300) {
+				Util.moveToLocation(rc, RobotPlayer.myHq);
+			} else {
+				Util.harass(rc, targets);
+			}
 		}
 	}
 }
