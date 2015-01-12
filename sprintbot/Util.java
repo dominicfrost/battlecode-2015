@@ -107,8 +107,9 @@ public class Util {
 		int numPointsOfInterest = rc.readBroadcast(MyConstants.NUM_POINTS_OF_INTEREST_OFFSET);
 		int offSet = MyConstants.POINTS_OF_INTEREST_OFFSET;
 		
-		int random = RobotPlayer.rand.nextInt(numPointsOfInterest) + 1;
-		MapLocation pointOfInterest = new MapLocation(rc.readBroadcast(random), rc.readBroadcast(random + 1));
+		int random = RobotPlayer.rand.nextInt(numPointsOfInterest);
+		random = 2 * random;
+		MapLocation pointOfInterest = new MapLocation(rc.readBroadcast(offSet + random), rc.readBroadcast(offSet + random + 1));
 		
 		return pointOfInterest;
 		
@@ -455,6 +456,10 @@ public class Util {
 		// for each surrounding square
 		for (Direction dir : directions){
 			int index = directionToInt(dir);
+			// if this direction is towards point of interest
+			if (dir == baseSquare.directionTo(RobotPlayer.pointOfInterest)){
+				squareValues[index] -= 1;
+			}
 			// determine value of each square
 			for (RobotInfo enemy : enemiesInSight){
 				int enemyRange = enemy.type.attackRadiusSquared;
