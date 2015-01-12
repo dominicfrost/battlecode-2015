@@ -7,8 +7,10 @@ import battlecode.common.*;
 public class Pathing {
 
     static Direction allDirections[] = Direction.values();
+    static MapLocation goal;
 
-    public static boolean straitBuggin(RobotController rc, MapLocation goal) throws GameActionException {
+    public static boolean straitBuggin(RobotController rc, MapLocation goal_in) throws GameActionException {
+        goal = goal_in;
         ArrayList<MapLocation> mLine = calcMLine(rc, goal);
         MapLocation myLocation;
         MapLocation nextLocation;
@@ -18,6 +20,7 @@ public class Pathing {
         while (true) {
             //get my location, if its the goal quit
             myLocation = rc.getLocation();
+//            System.out.println("dist to goal: " + myLocation.distanceSquaredTo(goal));
             if (myLocation.distanceSquaredTo(goal) < 1.5) {
                 return true;
             }
@@ -36,13 +39,13 @@ public class Pathing {
             nextLocationDir = myLocation.directionTo(nextLocation);
             if (canMove(rc, nextLocationDir)) {
                 if (!doMove(rc, nextLocationDir)) return false;
-                continue;
             } else {
                 //we could not move along the mLine, bug around the wall
                 //until we reach one of our loop conditons are met
                 MapLocation startingPoint = myLocation;
                 if (!putHandOnWall(rc, nextLocationDir, mLine)) return false;
             }
+            rc.yield();
         }
     }
 
@@ -68,7 +71,7 @@ public class Pathing {
 
     public static boolean followWall(RobotController rc, Direction myDir, boolean movedClockwise, ArrayList<MapLocation> mLine) throws GameActionException {
         while (true) {
-            if (mLine.contains(rc.getLocation())) {
+            if (mLine.contains(rc.getLocation()) || rc.getLocation().distanceSquaredTo(goal) < 1.5) {
                 return true;
             }
 
@@ -162,14 +165,15 @@ public class Pathing {
     public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) {
         Direction dirToGoal;
         ArrayList<MapLocation> mLine = new ArrayList<MapLocation>();
-        MapLocation previousLocation = rc.getLocation();
-
-        while (!previousLocation.equals(goal)) {
-            mLine.add(previousLocation);
-            dirToGoal = previousLocation.directionTo(goal);
-            previousLocation = previousLocation.add(dirToGoal);
+        MapLocation currentLocation = rc.getLocation();
+//        System.out.println("goal: " + goal.x + " " + goal.y);
+        while (!currentLocation.equals(goal)) {
+//            System.out.println("curLoc: " + currentLocation.x + " " + currentLocation.y);
+            mLine.add(currentLocation);
+            dirToGoal = currentLocation.directionTo(goal);
+            currentLocation = currentLocation.add(dirToGoal);
         }
-
+        mLine.add(goal);
         return mLine;
     }
 }

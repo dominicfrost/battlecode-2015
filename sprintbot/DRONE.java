@@ -22,7 +22,7 @@ public class DRONE {
 			if (supplyLevel < 300) {
 				Pathing.straitBuggin(rc, RobotPlayer.myHq);
 			} else {
-                Pathing.straitBuggin(rc, pointOfInterest);
+                Pathing.straitBuggin(rc, RobotPlayer.enemyHq);
 			}
 		}
 	}
