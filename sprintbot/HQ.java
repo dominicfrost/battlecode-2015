@@ -31,9 +31,8 @@ public class HQ {
         for (RobotInfo r : myRobots) {
             RobotType rt = r.type;
 
-            if (r.supplyLevel < 2000 && RobotPlayer.myHq.distanceSquaredTo(r.location) <= 15) {
-                rc.transferSupplies((int) Math.min(2000 - r.supplyLevel, rc.getSupplyLevel()), r.location);
-            }
+            // The max amount of supply we want any robot to acquire from the HQ
+            int maxRobotSupply = 500;
 
             switch (rt) {
                 case AEROSPACELAB:
@@ -55,6 +54,9 @@ public class HQ {
                     typeCount[RobotType.COMPUTER.ordinal()]++;
                     break;
                 case DRONE:
+                    // TODO: this may change when we figure out how much supply drones
+                    // are actually using and how much we have to offer
+                    maxRobotSupply = Math.min(4000, (2000 - Clock.getRoundNum()) * 5);
                     typeCount[RobotType.DRONE.ordinal()]++;
                     break;
                 case HANDWASHSTATION:
@@ -100,7 +102,12 @@ public class HQ {
                     typeCount[RobotType.TRAININGFIELD.ordinal()]++;
                     break;
             }
+
+            if (r.supplyLevel < maxRobotSupply && RobotPlayer.myHq.distanceSquaredTo(r.location) <= 15) {
+                rc.transferSupplies((int) Math.min(maxRobotSupply - r.supplyLevel, rc.getSupplyLevel()), r.location);
+            }
         }
+        typeCount[RobotType.HQ.ordinal()] = 1;
 
         for (int i = 0; i < typeCount.length; i++) {
             rc.broadcast(MyConstants.ROBOT_COUNT_OFFSET + i, typeCount[i]);
@@ -133,6 +140,7 @@ public class HQ {
             rc.broadcast(MyConstants.SPAWN_TYPE_OFFSET + type.ordinal(), numToSpawn);
             oreRemaining = oreRemaining - (type.oreCost * numToSpawn);
             System.out.println("Spawning " + numToSpawn + " " + type.toString() + " " + oreRemaining + " ore remaining");
+            allyTypeCount[type.ordinal()] -= numToSpawn;
         }
 
         return oreRemaining;
@@ -141,25 +149,19 @@ public class HQ {
     //set the spawning precedence here
     public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
         double remainingOre = rc.getTeamOre();
-        remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, 1);
+        remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, allyTypeCount[RobotType.HQ.ordinal()]);
         if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 1, remainingOre, 3);
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 1, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
         if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.BARRACKS, 1, remainingOre, 3);
+        remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 1, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
         if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.TANKFACTORY, 1, remainingOre, 3);
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 5, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
         if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 5, remainingOre, 1);
+        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
         if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.TANK, 5, remainingOre, 1);
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
         if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.TANKFACTORY, 3, remainingOre, 3);
-        if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 3, remainingOre, 3);
-        if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, 3);
-        if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.TANK, 25, remainingOre, 3);
+        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 9999, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
         if (remainingOre < 0) return;
     }
 
