@@ -14,6 +14,10 @@ public class RobotPlayer {
     static MapLocation[] enemyTowers;
     static MapLocation[] myTowers;
     static MapLocation pointOfInterest;
+	static boolean weaponReady;
+	static boolean coreReady;
+	static int sensorRange;
+	static int attackRange;
 
 	public static void run(RobotController rc) {
         myTeam = rc.getTeam();
@@ -24,12 +28,13 @@ public class RobotPlayer {
         myHq = rc.senseHQLocation();
         myTowers = rc.senseTowerLocations();
         pointOfInterest = null;
+		RobotType rt = rc.getType();
+		sensorRange = rc.getType().sensorRadiusSquared;
+		attackRange = rc.getType().attackRadiusSquared;
 
 		while(true) {
-
-            RobotType rt = rc.getType();
-            myTeam = rc.getTeam();
-            enemyTeam = myTeam.opponent();
+			weaponReady = rc.isWeaponReady();
+			coreReady = rc.isCoreReady();
 
 			switch (rt) {
 				case AEROSPACELAB:
