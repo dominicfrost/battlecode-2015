@@ -18,7 +18,7 @@ public class Pathing {
         while (true) {
             //get my location, if its the goal quit
             myLocation = rc.getLocation();
-            if (myLocation.equals(goal)) {
+            if (myLocation.distanceSquaredTo(goal) < 1.5) {
                 return true;
             }
 
@@ -34,7 +34,7 @@ public class Pathing {
             nextLocation = mLine.get(myLocationIndex + 1);
 
             nextLocationDir = myLocation.directionTo(nextLocation);
-            if (rc.canMove(nextLocationDir)) {
+            if (canMove(rc, nextLocationDir)) {
                 if (!doMove(rc, nextLocationDir)) return false;
                 continue;
             } else {
@@ -54,12 +54,12 @@ public class Pathing {
             rightDir = rightDir.rotateRight();
             leftDir = leftDir.rotateLeft();
 
-            if (rc.canMove(rightDir)) {
+            if (canMove(rc, rightDir)) {
                 if (!doMove(rc, rightDir)) return false;
                 return followWall(rc, rightDir, true, mLine);
             }
 
-            if (rc.canMove(leftDir)) {
+            if (canMove(rc, leftDir)) {
                 if (!doMove(rc, leftDir)) return false;
                 return followWall(rc, leftDir, false, mLine);
             }
@@ -74,7 +74,7 @@ public class Pathing {
 
             //if i can go in towards the mline do it
             Direction backInwards = rotateInDir(myDir, movedClockwise);
-            if (rc.canMove(backInwards)) {
+            if (canMove(rc, backInwards)) {
                 if (mLine.contains(rc.getLocation().add(myDir))) {
                     return doMove(rc, myDir);
                 }
@@ -84,7 +84,7 @@ public class Pathing {
             }
 
             //if i can go strait do it
-            if (rc.canMove(myDir)) {
+            if (canMove(rc, myDir)) {
                 if (!doMove(rc, myDir)) return false;
                 continue;
             }
@@ -94,7 +94,7 @@ public class Pathing {
             while (true) {
                 turns++;
                 myDir = rotateInDir(myDir, !movedClockwise);
-                if (rc.canMove(myDir)) {
+                if (canMove(rc, myDir)) {
                     if (!doMove(rc, myDir)) return false;
                     int completeTurn = turns % 2;
                     if (completeTurn == 0) {
@@ -112,6 +112,23 @@ public class Pathing {
         } else {
             return startDir.rotateRight();
         }
+    }
+
+    public static boolean canMove(RobotController rc, Direction dir) throws GameActionException {
+        if (!rc.canMove(dir)) {
+            return false;
+        }
+
+        if (rc.getLocation().add(dir).distanceSquaredTo(RobotPlayer.enemyHq) <= 35) {
+            return false;
+        }
+        for (MapLocation towerLoc: RobotPlayer.enemyTowers) {
+            if (rc.getLocation().add(dir).distanceSquaredTo(towerLoc) <= 25) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static boolean doMove(RobotController rc, Direction dir) throws GameActionException {
