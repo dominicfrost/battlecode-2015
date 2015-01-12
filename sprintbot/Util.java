@@ -393,12 +393,6 @@ public class Util {
 		return false;
 	}
 
-
-	private static Direction moveToLocation(RobotController rc, MapLocation loc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	// Assign a value to all surrounding squares. The square with the lowest value is returned, directions towards
 	// enemy HQ are given preference. Square value = (2 * damage going to take next turn in that square) - (damage 
 	// robot can inflict). 
