@@ -31,6 +31,7 @@ public class HQ {
     }
 
     private static void setPointsOfInterest(int numPoints) throws GameActionException {
+    	rc.broadcast(MyConstants.NUM_POINTS_OF_INTEREST_OFFSET, numPoints);
 		MapLocation myHq = RobotPlayer.myHq;
 		MapLocation enemyHq = RobotPlayer.enemyHq;
 		MapLocation[] pointsOfInterest = new MapLocation[numPoints];

@@ -106,6 +106,17 @@ public class Util {
 			rc.attackLocation(enemies[0].location);
 		}
 	}
+	
+	public static MapLocation getNewPointOfInterest(RobotController rc) throws GameActionException{
+		int numPointsOfInterest = rc.readBroadcast(MyConstants.NUM_POINTS_OF_INTEREST_OFFSET);
+		int offSet = MyConstants.POINTS_OF_INTEREST_OFFSET;
+		
+		int random = RobotPlayer.rand.nextInt(numPointsOfInterest) + 1;
+		MapLocation pointOfInterest = new MapLocation(rc.readBroadcast(random), rc.readBroadcast(random + 1));
+		
+		return pointOfInterest;
+		
+	}
 
 	public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation) {
 		MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
@@ -120,7 +131,6 @@ public class Util {
 				return false;
 			}
 		}
-
 		return true;
 	}
 
