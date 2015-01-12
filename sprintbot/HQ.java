@@ -78,8 +78,8 @@ public class HQ {
 		}
 		
 		for (int i = 0; i < numPoints; i++){
-			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (3 * i), pointsOfInterest[i].x);
-			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (3 * i + 1), pointsOfInterest[i].y);
+			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (2 * i), pointsOfInterest[i].x);
+			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (2 * i + 1), pointsOfInterest[i].y);
 		}
 	}
 
@@ -209,6 +209,7 @@ public class HQ {
     //set the spawning precedence here
     public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
         double remainingOre = rc.getTeamOre();
+        remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, allyTypeCount[RobotType.HQ.ordinal()]);
         if (remainingOre < 0) return;
         remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, 1);
         if (remainingOre < 0) return;

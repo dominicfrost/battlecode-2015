@@ -6,6 +6,7 @@ public class DRONE {
 	public static RobotController rc;
     public static RobotType[] targets = {RobotType.BEAVER, RobotType.MINER,
             RobotType.SOLDIER, RobotType.BASHER};
+    MapLocation pointOfInterest = null;
 
 	public static void execute(RobotController rc_in) throws GameActionException {
 		rc = rc_in;

@@ -1,6 +1,7 @@
 package sprintbot;
 
 import battlecode.common.*;
+
 import java.util.*;
 
 public class RobotPlayer {
@@ -12,6 +13,7 @@ public class RobotPlayer {
     static MapLocation myHq;
     static MapLocation[] enemyTowers;
     static MapLocation[] myTowers;
+    static MapLocation pointOfInterest;
 
 	public static void run(RobotController rc) {
         myTeam = rc.getTeam();
@@ -21,6 +23,7 @@ public class RobotPlayer {
         enemyTowers = rc.senseEnemyTowerLocations();
         myHq = rc.senseHQLocation();
         myTowers = rc.senseTowerLocations();
+        pointOfInterest = null;
 
 		while(true) {
 
