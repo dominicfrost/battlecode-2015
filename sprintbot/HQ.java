@@ -78,8 +78,8 @@ public class HQ {
 		}
 		
 		for (int i = 0; i < numPoints; i++){
-			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (3 * i), pointsOfInterest[i].x);
-			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (3 * i + 1), pointsOfInterest[i].y);
+			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (2 * i), pointsOfInterest[i].x);
+			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (2 * i + 1), pointsOfInterest[i].y);
 		}
 	}
 
