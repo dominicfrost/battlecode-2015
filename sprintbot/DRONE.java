@@ -21,9 +21,9 @@ public class DRONE {
 		if (rc.isCoreReady()) {
 			// first defend any towers
 			for (int i = 0; i < 6; i++) {
-				if (rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS + i) == 0) {
-					int x = rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + i);
-					int y = rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + i + 1);
+				if (rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS + i) == 1) {
+					int x = rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + (i * 2));
+					int y = rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + (i * 2) + 1);
 					pointOfInterest = new MapLocation(x, y);
 				}
 			}

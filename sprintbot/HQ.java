@@ -228,7 +228,7 @@ public class HQ {
 		if (remainingOre < 0) return;
 		remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 2, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
 		if (remainingOre < 0) return;
-		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
+		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 9999999, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
 		//        if (remainingOre < 0) return;
 		//        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
 		//        if (remainingOre < 0) return;
