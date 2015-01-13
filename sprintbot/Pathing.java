@@ -9,8 +9,10 @@ public class Pathing {
     static Direction allDirections[] = Direction.values();
     static MapLocation goal;
     static MapLocation myLocation;
+    static boolean moveInOnGoal;
 
-    public static boolean straitBuggin(RobotController rc, MapLocation goal_in) throws GameActionException {
+    public static boolean straitBuggin(RobotController rc, MapLocation goal_in, boolean moveInOnGoal_in) throws GameActionException {
+        moveInOnGoal = moveInOnGoal_in;
         goal = goal_in;
         ArrayList<MapLocation> mLine = calcMLine(rc, goal);
         //MapLocation myLocation;
@@ -122,6 +124,9 @@ public class Pathing {
 
     public static boolean canMove(RobotController rc, Direction dir) throws GameActionException {
         if (rc.getLocation().add(dir).distanceSquaredTo(RobotPlayer.enemyHq) <= 35) {
+            if (moveInOnGoal && RobotPlayer.enemyHq.equals(goal)) {
+                return true;
+            }
             return false;
         }
         if (rc.getLocation().add(dir).equals(RobotPlayer.myHq)) {
@@ -129,6 +134,9 @@ public class Pathing {
         }
         for (MapLocation towerLoc: RobotPlayer.enemyTowers) {
             if (rc.getLocation().add(dir).distanceSquaredTo(towerLoc) <= 24) {
+                if (moveInOnGoal && towerLoc.equals(goal)) {
+                    return true;
+                }
                 return false;
             }
         }

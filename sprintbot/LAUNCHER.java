@@ -20,7 +20,7 @@ public class LAUNCHER {
                 }
             }
             if (atGoal == false) {
-                atGoal = Pathing.straitBuggin(rc, goal);
+                atGoal = Pathing.straitBuggin(rc, goal, true);
             } else {
                 tryLaunch(rc);
             }

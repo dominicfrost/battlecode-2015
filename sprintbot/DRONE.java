@@ -28,7 +28,7 @@ public class DRONE {
 //		double supplyLevel = rc.getSupplyLevel();
 
 		if (rc.isCoreReady()) {
-            if (!Pathing.straitBuggin(rc, pointOfInterest)) {
+            if (!Pathing.straitBuggin(rc, pointOfInterest, false)) {
                 while (!rc.isCoreReady()) rc.yield();
                 tryMoveAvoidES(rc, Util.intToDirection(RobotPlayer.rand.nextInt(7)));
             }
