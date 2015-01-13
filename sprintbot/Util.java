@@ -211,21 +211,21 @@ public class Util {
 			double ore_NW = rc.senseOre(getAdjacentLocation(rc, Direction.NORTH_WEST, myLocation));
 
 
-			if(oreCount < ore_N)
+			if(1.3*oreCount < ore_N)
 				OreLocations.add(1);
-			if(oreCount < ore_NE)
+			if(1.3*oreCount < ore_NE)
 				OreLocations.add(2);
-			if(oreCount < ore_E)
+			if(1.3*oreCount < ore_E)
 				OreLocations.add(3);
-			if(oreCount < ore_SE)
+			if(1.3*oreCount < ore_SE)
 				OreLocations.add(4);
-			if(oreCount < ore_S)
+			if(1.3*oreCount < ore_S)
 				OreLocations.add(5);
-			if(oreCount < ore_SW)
+			if(1.3*oreCount < ore_SW)
 				OreLocations.add(6);
-			if(oreCount < ore_W)
+			if(1.3*oreCount < ore_W)
 				OreLocations.add(7);
-			if(oreCount < ore_NW)
+			if(1.3*oreCount < ore_NW)
 				OreLocations.add(8);
 
 			if(OreLocations.size() == 0)
@@ -234,8 +234,6 @@ public class Util {
 				else
 					tryMove(rc, Util.intToDirection(RobotPlayer.rand.nextInt(8)));
 			else {
-				if (oreCount > 0)
-					rc.mine();
 				int pick = RobotPlayer.rand.nextInt(OreLocations.size());
 				Util.tryMove(rc, intToDirection((int) OreLocations.get(pick)));
 			}
