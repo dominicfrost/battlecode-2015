@@ -143,7 +143,7 @@ public class RobotPlayer {
 					break;
 				case MISSILE:
 					try {
-						MISSLE.execute(rc);
+						MISSILE.execute(rc);
 					} catch (Exception e) {
 						System.out.println("MISSILE Exception");
 						e.printStackTrace();
