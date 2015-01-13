@@ -222,14 +222,20 @@ public class HQ {
 		if (remainingOre < 0) return;
 		remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 2, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
 		if (remainingOre < 0) return;
-		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 9999999, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
-		//        if (remainingOre < 0) return;
-		//        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
-		//        if (remainingOre < 0) return;
-		//        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
-		//        if (remainingOre < 0) return;
-		//        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 9999, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
-		//        if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
+		if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 2, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
+		if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
+		if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 5, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
+		if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 50, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
+		if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 15, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
+		if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 9999, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
+		if (remainingOre < 0) return;
 	}
 
 
