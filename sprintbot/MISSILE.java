@@ -8,9 +8,8 @@ public class MISSILE {
 
     public static void execute(RobotController rc) throws GameActionException {
         MapLocation myLocation = rc.getLocation();
-        int ATTACK_LOCATION = MyConstants.ATTACK_LOCATION;
-        MapLocation atk = Util.intToMapLoc(ATTACK_LOCATION);
-        Direction gank = myLocation.directionTo(atk);
+        MapLocation target = new MapLocation(rc.readBroadcast(MyConstants.TARGET_TOWER_X), rc.readBroadcast(MyConstants.TARGET_TOWER_Y));
+        Direction gank = myLocation.directionTo(target);
         
         int gankenum = Util.directionToInt(gank);
         
@@ -20,7 +19,7 @@ public class MISSILE {
         //IF ADJACENT TO DESTINATION, EXPLODE 
         //IF CAN MOVE IN DIRECTION OF ATTACK_LOCATION, DO THAT, OTHERWISE IF CAN MOVE THE DIAGONALS OF THAT, DO THAT, OTHERWISE YIELD
         
-        if (myLocation.distanceSquaredTo(atk) <= 1)
+        if (myLocation.distanceSquaredTo(target) <= 1)
         	rc.explode();
         else if(rc.canMove(gank))
         	rc.move(gank);

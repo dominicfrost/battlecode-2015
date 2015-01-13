@@ -124,7 +124,7 @@ public class HQ {
 				// TODO: this may change when we figure out how much supply drones
 				// are actually using and how much we have to offer
 				maxRobotSupply = Math.min(4000, (2000 - Clock.getRoundNum()) * 5);
-			typeCount[RobotType.DRONE.ordinal()]++;
+				typeCount[RobotType.DRONE.ordinal()]++;
 			break;
 			case HANDWASHSTATION:
 				typeCount[RobotType.HANDWASHSTATION.ordinal()]++;
@@ -136,6 +136,7 @@ public class HQ {
 				typeCount[RobotType.HQ.ordinal()]++;
 				break;
 			case LAUNCHER:
+				maxRobotSupply = Math.min(20000, (2000 - Clock.getRoundNum()) * 25);
 				typeCount[RobotType.LAUNCHER.ordinal()]++;
 				break;
 			case MINER:
@@ -222,7 +223,7 @@ public class HQ {
 		if (remainingOre < 0) return;
 		remainingOre = spawningRule(allyTypeCount, RobotType.AEROSPACELAB, 1, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
         if (remainingOre < 0) return;
-		        remainingOre = spawningRule(allyTypeCount, RobotType.LAUNCHER, 1, remainingOre, allyTypeCount[RobotType.AEROSPACELAB.ordinal()]);
+		        remainingOre = spawningRule(allyTypeCount, RobotType.LAUNCHER, 99, remainingOre, allyTypeCount[RobotType.AEROSPACELAB.ordinal()]);
 		        if (remainingOre < 0) return;
 		//        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
 		//        if (remainingOre < 0) return;
