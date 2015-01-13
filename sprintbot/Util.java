@@ -509,7 +509,7 @@ public class Util {
 	}
 
 	public static void debug(RobotController rc, String msg) throws GameActionException {
-		if (rc.getID() == 34293) {
+		if (rc.getID() == 26777 && Clock.getRoundNum() < 1000) {
 			System.out.println("DEBUG: " + msg);
 		}
 	}
