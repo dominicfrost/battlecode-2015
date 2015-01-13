@@ -56,7 +56,7 @@ public class HQ {
 		}
 
 		// how close we want the point to be to enemy location relative to map size
-		double pointProximity = (1.0 / 100.0);
+		double pointProximity = (75.0 / 100.0);
 		// Corner Locations
 		double xCornerX = (myHq.add(xDir, Math.abs((distX))).x);
 		double xCornerY = (myHq.add(yDir, (int)(Math.abs(distY) * pointProximity))).y;
@@ -73,7 +73,7 @@ public class HQ {
 
 		int finalXLine = (int)Math.sqrt(yCorner.distanceSquaredTo(enemyHq));
 		int finalYLine = (int)Math.sqrt(xCorner.distanceSquaredTo(enemyHq));
-		
+
 		double jumpSize = (1 / ((double)numPoints - 1));
 
 		for (int i = 1; i < numPoints - 1; i++){
@@ -124,8 +124,8 @@ public class HQ {
 				// TODO: this may change when we figure out how much supply drones
 				// are actually using and how much we have to offer
 				maxRobotSupply = Math.min(4000, (2000 - Clock.getRoundNum()) * 5);
-			typeCount[RobotType.DRONE.ordinal()]++;
-			break;
+				typeCount[RobotType.DRONE.ordinal()]++;
+				break;
 			case HANDWASHSTATION:
 				typeCount[RobotType.HANDWASHSTATION.ordinal()]++;
 				break;
@@ -256,5 +256,5 @@ public class HQ {
 		rc.broadcast(MyConstants.ATTACK_LOCATION, closest.x);
 		rc.broadcast(MyConstants.ATTACK_LOCATION + 1, closest.y);
 	}
-	
+
 }
