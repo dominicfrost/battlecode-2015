@@ -24,7 +24,7 @@ public class RobotPlayer {
         enemyTeam = myTeam.opponent();
         rand = new Random(rc.getID());
         enemyHq = rc.senseEnemyHQLocation();
-        enemyTowers = rc.senseEnemyTowerLocations();
+
         myHq = rc.senseHQLocation();
         myTowers = rc.senseTowerLocations();
         pointOfInterest = rc.senseHQLocation();
@@ -35,6 +35,7 @@ public class RobotPlayer {
 		while(true) {
 			weaponReady = rc.isWeaponReady();
 			coreReady = rc.isCoreReady();
+            enemyTowers = rc.senseEnemyTowerLocations();
 
 			switch (rt) {
 				case AEROSPACELAB:
