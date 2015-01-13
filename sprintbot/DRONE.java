@@ -6,11 +6,11 @@ public class DRONE {
 	public static RobotController rc;
     public static RobotType[] targets = {RobotType.BEAVER, RobotType.MINER,
             							 RobotType.SOLDIER, RobotType.BASHER};
-    public static MapLocation pointOfInterest = null;
+    public static MapLocation pointOfInterest = RobotPlayer.myHq;
 
 	public static void execute(RobotController rc_in) throws GameActionException {
 		rc = rc_in;
-		if (pointOfInterest == null || rc.getLocation().distanceSquaredTo(pointOfInterest) < 9){
+		if (rc.getLocation().distanceSquaredTo(pointOfInterest) <= 4){
 			pointOfInterest = Util.getNewPointOfInterest(rc);
 		}
 		
@@ -22,7 +22,7 @@ public class DRONE {
 			if (supplyLevel < 300) {
 				Pathing.straitBuggin(rc, RobotPlayer.myHq);
 			} else {
-                Pathing.straitBuggin(rc, RobotPlayer.enemyHq);
+                Pathing.straitBuggin(rc, pointOfInterest);
 			}
 		}
 	}

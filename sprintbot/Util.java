@@ -55,23 +55,23 @@ public class Util {
 		return false;
 	}
 
-    public static void generalAttack(RobotController rc) throws GameActionException{
-        MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
-        if (RobotPlayer.coreReady) {
-            if (rc.canAttackLocation(goal)) {
-                rc.attackLocation(goal);
-                return;
-            }
-            RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
-            if (!attack(rc, enemyRobots)) {
-                if (rc.getHealth() < 40) {
-                    tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
-                    return;
-                }
-                tryMove(rc, rc.getLocation().directionTo(goal));
-            }
-        }
-    }
+	public static void generalAttack(RobotController rc) throws GameActionException{
+		MapLocation goal = new MapLocation(rc.readBroadcast(MyConstants.ATTACK_LOCATION), rc.readBroadcast(MyConstants.ATTACK_LOCATION + 1));
+		if (RobotPlayer.coreReady) {
+			if (rc.canAttackLocation(goal)) {
+				rc.attackLocation(goal);
+				return;
+			}
+			RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
+			if (!attack(rc, enemyRobots)) {
+				if (rc.getHealth() < 40) {
+					tryMove(rc, rc.getLocation().directionTo(rc.senseHQLocation()));
+					return;
+				}
+				tryMove(rc, rc.getLocation().directionTo(goal));
+			}
+		}
+	}
 
 	public static int mapLocToInt(MapLocation m){
 		return (m.x*10000 + m.y);
@@ -102,17 +102,17 @@ public class Util {
 			rc.attackLocation(enemies[0].location);
 		}
 	}
-	
+
 	public static MapLocation getNewPointOfInterest(RobotController rc) throws GameActionException{
 		int numPointsOfInterest = rc.readBroadcast(MyConstants.NUM_POINTS_OF_INTEREST_OFFSET);
 		int offSet = MyConstants.POINTS_OF_INTEREST_OFFSET;
-		
+
 		int random = RobotPlayer.rand.nextInt(numPointsOfInterest);
 		random = 2 * random;
 		MapLocation pointOfInterest = new MapLocation(rc.readBroadcast(offSet + random), rc.readBroadcast(offSet + random + 1));
 		
 		return pointOfInterest;
-		
+
 	}
 
 	public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation) {
@@ -394,7 +394,8 @@ public class Util {
 		return mLine;
 	}
 
-	public static boolean harass(RobotController rc, RobotType[] targets) throws GameActionException {
+	public static Boolean harass(RobotController rc, RobotType[] targets) throws GameActionException {
+
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemiesInSight = rc.senseNearbyRobots(RobotPlayer.sensorRange, rc.getTeam().opponent());
 		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(RobotPlayer.attackRange, rc.getTeam().opponent());
@@ -408,7 +409,7 @@ public class Util {
 		}
 
 		// enemies in sight
-		if (enemiesInSight.length > 0 && rc.isCoreReady()){
+		if (enemiesInSight.length > 0){
 			nextMove = kiteDirection(rc, myLocation, enemiesInSight);
 			if (nextMove != null && rc.canMove(nextMove)){
 				rc.move(nextMove);
@@ -456,14 +457,18 @@ public class Util {
 		for (Direction dir : directions){
 			int index = directionToInt(dir);
 			// if this direction is towards point of interest
-			if (dir == baseSquare.directionTo(RobotPlayer.pointOfInterest)){
-				squareValues[index] -= 1;
+			MapLocation pointInt = RobotPlayer.pointOfInterest;
+			if (pointInt != null) {
+				if (baseSquare.directionTo(pointInt) == dir){
+					squareValues[index] -= 1;
+				}
 			}
 			// determine value of each square
 			for (RobotInfo enemy : enemiesInSight){
 				int enemyRange = enemy.type.attackRadiusSquared;
 				int distanceFromEnemy = baseSquare.add(dir).distanceSquaredTo(enemy.location);
 				// if an enemy can hit me, add 2 * its damage to this square
+				System.out.print("Index: " + index);
 				if (enemyRange >= distanceFromEnemy){
 					squareValues[index] += (2 * enemy.type.attackPower);
 				}
@@ -485,9 +490,9 @@ public class Util {
 		return dirToMove;
 	}
 	private static void attackByType(RobotController rc, RobotInfo[] enemies, RobotType[] targetTypes) throws GameActionException {
-        if (enemies.length == 0) {
-            return;
-        }
+		if (enemies.length == 0) {
+			return;
+		}
 		RobotInfo target = enemies[0];
 		double lowestHealth = enemies[0].health;
 
@@ -504,9 +509,9 @@ public class Util {
 		}
 	}
 
-    public static void debug(RobotController rc, String msg) {
-        if (rc.getID() == 34293) {
-            System.out.println("DEBUG: " + msg);
-        }
-    }
+	public static void debug(RobotController rc, String msg) {
+		if (rc.getID() == 34293) {
+			System.out.println("DEBUG: " + msg);
+		}
+	}
 }

@@ -27,7 +27,7 @@ public class RobotPlayer {
         enemyTowers = rc.senseEnemyTowerLocations();
         myHq = rc.senseHQLocation();
         myTowers = rc.senseTowerLocations();
-        pointOfInterest = null;
+        pointOfInterest = rc.senseHQLocation();
 		RobotType rt = rc.getType();
 		sensorRange = rc.getType().sensorRadiusSquared;
 		attackRange = rc.getType().attackRadiusSquared;
