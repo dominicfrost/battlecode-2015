@@ -56,7 +56,7 @@ public class HQ {
 		}
 
 		// how close we want the point to be to enemy location relative to map size
-		double pointProximity = (75.0 / 100.0);
+		double pointProximity = (1.0 / 100.0);
 		// Corner Locations
 		double xCornerX = (myHq.add(xDir, Math.abs((distX))).x);
 		double xCornerY = (myHq.add(yDir, (int)(Math.abs(distY) * pointProximity))).y;
@@ -73,7 +73,7 @@ public class HQ {
 
 		int finalXLine = (int)Math.sqrt(yCorner.distanceSquaredTo(enemyHq));
 		int finalYLine = (int)Math.sqrt(xCorner.distanceSquaredTo(enemyHq));
-
+		
 		double jumpSize = (1 / ((double)numPoints - 1));
 
 		for (int i = 1; i < numPoints - 1; i++){
@@ -124,8 +124,8 @@ public class HQ {
 				// TODO: this may change when we figure out how much supply drones
 				// are actually using and how much we have to offer
 				maxRobotSupply = Math.min(4000, (2000 - Clock.getRoundNum()) * 5);
-				typeCount[RobotType.DRONE.ordinal()]++;
-				break;
+			typeCount[RobotType.DRONE.ordinal()]++;
+			break;
 			case HANDWASHSTATION:
 				typeCount[RobotType.HANDWASHSTATION.ordinal()]++;
 				break;
@@ -216,22 +216,16 @@ public class HQ {
 	//set the spawning precedence here
 	public static void broadcastNextSpawnType(int[] allyTypeCount) throws GameActionException{
 		double remainingOre = rc.getTeamOre();
-		remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, allyTypeCount[RobotType.HQ.ordinal()]);
+		remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 1, remainingOre, allyTypeCount[RobotType.HQ.ordinal()]);
 		if (remainingOre < 0) return;
-		remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, 1);
+		remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 1, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
+		if (remainingOre < 0) return;
+		remainingOre = spawningRule(allyTypeCount, RobotType.AEROSPACELAB, 1, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
         if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 3, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
-        if (remainingOre < 0) return;
-        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 20, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
-		if (remainingOre < 0) return;
-		remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 2, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
-		if (remainingOre < 0) return;
-		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 10000, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
-		//        if (remainingOre < 0) return;
-		//        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
-		//        if (remainingOre < 0) return;
-		        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
+		        remainingOre = spawningRule(allyTypeCount, RobotType.LAUNCHER, 1, remainingOre, allyTypeCount[RobotType.AEROSPACELAB.ordinal()]);
 		        if (remainingOre < 0) return;
+		//        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
+		//        if (remainingOre < 0) return;
 		//        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 9999, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
 		//        if (remainingOre < 0) return;
 	}
@@ -254,5 +248,5 @@ public class HQ {
 		rc.broadcast(MyConstants.ATTACK_LOCATION, closest.x);
 		rc.broadcast(MyConstants.ATTACK_LOCATION + 1, closest.y);
 	}
-
+	
 }

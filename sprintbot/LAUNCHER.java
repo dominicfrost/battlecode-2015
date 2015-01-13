@@ -7,23 +7,18 @@ public class LAUNCHER {
     public static boolean atGoal = false;
     public static MapLocation goal = null;
     public static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+    public static int numTowers;
 
 
     public static void execute(RobotController rc_in) throws GameActionException {
         rc = rc_in;
-        if (!tryLaunch(rc)) {
-            if (goal == null) {
-                int towerIndex = rc.readBroadcast(MyConstants.ALONE_TOWER_INDEX);
-                if (towerIndex < RobotPlayer.myTowers.length) {
-                    goal = RobotPlayer.myTowers[towerIndex];
-                    rc.broadcast(MyConstants.ALONE_TOWER_INDEX, ++towerIndex);
-                }
-            }
-            if (atGoal == false) {
-                atGoal = Pathing.straitBuggin(rc, goal, true);
-            } else {
-                tryLaunch(rc);
-            }
+        MapLocation target = new MapLocation(rc.readBroadcast(MyConstants.TARGET_TOWER_X), rc.readBroadcast(MyConstants.TARGET_TOWER_Y));
+
+        Direction targetDir = rc.getLocation().directionTo(target);
+        if (rc.getLocation().add(targetDir).distanceSquaredTo(target) < 24) {
+            tryLaunch(rc);
+        } else {
+            Pathing.straitBuggin(rc, target, true);
         }
     }
 
@@ -31,7 +26,7 @@ public class LAUNCHER {
         if (rc.isCoreReady() && rc.getMissileCount() > 0) {
             // get the direction to launch
             // this direction is the direction to the weighted avg of enemy locations
-            RobotInfo[] enemiesInRange = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
+            RobotInfo[] enemiesInRange = rc.senseNearbyRobots(25, RobotPlayer.enemyTeam);
             if (enemiesInRange.length > 0) {
                 int counterx = 0;
                 int countery = 0;
