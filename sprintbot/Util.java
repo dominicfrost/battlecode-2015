@@ -234,6 +234,8 @@ public class Util {
 				else
 					tryMove(rc, Util.intToDirection(RobotPlayer.rand.nextInt(8)));
 			else {
+				if (oreCount > 0)
+					rc.mine();
 				int pick = RobotPlayer.rand.nextInt(OreLocations.size());
 				Util.tryMove(rc, intToDirection((int) OreLocations.get(pick)));
 			}
