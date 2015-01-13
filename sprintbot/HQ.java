@@ -225,15 +225,19 @@ public class HQ {
 		remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, allyTypeCount[RobotType.HQ.ordinal()]);
 		if (remainingOre < 0) return;
 		remainingOre = spawningRule(allyTypeCount, RobotType.BEAVER, 3, remainingOre, 1);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINERFACTORY, 3, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
+        if (remainingOre < 0) return;
+        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 20, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
 		if (remainingOre < 0) return;
 		remainingOre = spawningRule(allyTypeCount, RobotType.HELIPAD, 2, remainingOre, allyTypeCount[RobotType.BEAVER.ordinal()]);
 		if (remainingOre < 0) return;
-		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
+		remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 10000, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
 		//        if (remainingOre < 0) return;
 		//        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 5, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
 		//        if (remainingOre < 0) return;
-		//        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
-		//        if (remainingOre < 0) return;
+		        remainingOre = spawningRule(allyTypeCount, RobotType.MINER, 25, remainingOre, allyTypeCount[RobotType.MINERFACTORY.ordinal()]);
+		        if (remainingOre < 0) return;
 		//        remainingOre = spawningRule(allyTypeCount, RobotType.DRONE, 9999, remainingOre, allyTypeCount[RobotType.HELIPAD.ordinal()]);
 		//        if (remainingOre < 0) return;
 	}

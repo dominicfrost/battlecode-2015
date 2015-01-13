@@ -19,11 +19,49 @@ public class DRONE {
 		double supplyLevel = rc.getSupplyLevel();
 
 		if (rc.isCoreReady()) {
-			if (supplyLevel < 300) {
-				Pathing.straitBuggin(rc, RobotPlayer.myHq);
-			} else {
-                Pathing.straitBuggin(rc, RobotPlayer.enemyHq);
-			}
+            Pathing.straitBuggin(rc, RobotPlayer.enemyHq);
+            if (!Pathing.straitBuggin(rc, RobotPlayer.enemyHq)) {
+                while (!rc.isCoreReady()) rc.yield();
+                tryMoveAvoidES(rc, Util.intToDirection(RobotPlayer.rand.nextInt(7)));
+            }
 		}
 	}
+
+    public static void tryMoveAvoidES(RobotController rc, Direction d) throws GameActionException {
+
+        MapLocation myLocation = rc.getLocation();
+        MapLocation toMove = null;
+        MapLocation trying;
+        Direction tryDir;
+
+        for (int i = 0; i < 4; i++) {
+            tryDir = Util.intToDirection(i);
+            trying = myLocation.add(Util.intToDirection(i));
+            for (MapLocation enemyTower: RobotPlayer.enemyTowers) {
+                if (enemyTower.distanceSquaredTo(myLocation) > 24) {
+                    if(RobotPlayer.enemyHq.distanceSquaredTo(myLocation) > 34) {
+                        if(rc.canMove(tryDir)) {
+                            rc.move(tryDir);
+                        }
+                        return;
+                    }
+                }
+            }
+
+
+            tryDir = Util.intToDirection(((-1*i) + 8) % 8);
+            trying = myLocation.add(Util.intToDirection(i));
+            for (MapLocation enemyTower: RobotPlayer.enemyTowers) {
+                if (enemyTower.distanceSquaredTo(myLocation) > 24) {
+                    if(RobotPlayer.enemyHq.distanceSquaredTo(myLocation) > 34) {
+                        if(rc.canMove(tryDir)) {
+                            rc.move(tryDir);
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+    }
 }
