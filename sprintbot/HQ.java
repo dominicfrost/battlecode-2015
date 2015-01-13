@@ -56,7 +56,7 @@ public class HQ {
 		}
 
 		// how close we want the point to be to enemy location relative to map size
-		double pointProximity = (80.0 / 100.0);
+		double pointProximity = (1.0 / 100.0);
 		// Corner Locations
 		double xCornerX = (myHq.add(xDir, Math.abs((distX))).x);
 		double xCornerY = (myHq.add(yDir, (int)(Math.abs(distY) * pointProximity))).y;

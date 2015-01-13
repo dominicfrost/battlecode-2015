@@ -468,7 +468,6 @@ public class Util {
 				int enemyRange = enemy.type.attackRadiusSquared;
 				int distanceFromEnemy = baseSquare.add(dir).distanceSquaredTo(enemy.location);
 				// if an enemy can hit me, add 2 * its damage to this square
-				System.out.print("Index: " + index);
 				if (enemyRange >= distanceFromEnemy){
 					squareValues[index] += (2 * enemy.type.attackPower);
 				}
