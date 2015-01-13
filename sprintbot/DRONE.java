@@ -19,6 +19,15 @@ public class DRONE {
 		double supplyLevel = rc.getSupplyLevel();
 
 		if (rc.isCoreReady()) {
+			// first defend any towers
+			for (int i = 0; i < 6; i++) {
+				if (rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS + i) == 1) {
+					int x = rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + (i * 2));
+					int y = rc.readBroadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + (i * 2) + 1);
+					pointOfInterest = new MapLocation(x, y);
+				}
+			}
+
 			if (supplyLevel < 300) {
 				Pathing.straitBuggin(rc, RobotPlayer.myHq);
 			} else {
