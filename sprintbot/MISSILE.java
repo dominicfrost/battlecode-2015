@@ -2,7 +2,7 @@ package sprintbot;
 
 import battlecode.common.*;
 
-public class MISSLE {
+public class MISSILE {
     public static boolean first = false;
     public static MapLocation toAttack = null;
 

@@ -27,7 +27,7 @@ public class RobotPlayer {
         enemyTowers = rc.senseEnemyTowerLocations();
         myHq = rc.senseHQLocation();
         myTowers = rc.senseTowerLocations();
-        pointOfInterest = null;
+        pointOfInterest = rc.senseHQLocation();
 		RobotType rt = rc.getType();
 		sensorRange = rc.getType().sensorRadiusSquared;
 		attackRange = rc.getType().attackRadiusSquared;
@@ -143,7 +143,7 @@ public class RobotPlayer {
 					break;
 				case MISSILE:
 					try {
-						MISSLE.execute(rc);
+						MISSILE.execute(rc);
 					} catch (Exception e) {
 						System.out.println("MISSILE Exception");
 						e.printStackTrace();

@@ -17,36 +17,36 @@ public class BEAVER {
 		}
     	
     	
-    	if(Clock.getRoundNum()<200)
-    		mineOrMove(rc);
-    	else if(Clock.getRoundNum()<300)
-    		if(rc.getTeamOre()>500)
-    			buildUnit(rc, RobotType.MINERFACTORY);
-    		else
-    			mineOrMove(rc);
-    	else if(Clock.getRoundNum()<400)
-    		mineOrMove(rc);
-    	else if(Clock.getRoundNum()<500)
-    		if(rc.getTeamOre()>300)
-        		buildUnit(rc, RobotType.BARRACKS);
-    		else
-    			mineOrMove(rc);
-    	else if(Clock.getRoundNum()<600)
-    		mineOrMove(rc);
-    	else if(Clock.getRoundNum()<700)
-    		if(rc.getTeamOre()>200)
-        		buildUnit(rc, RobotType.MINERFACTORY);
-    		else
-    			mineOrMove(rc);
-    	else if(Clock.getRoundNum()<1000)
-    		if(rc.getTeamOre()>300)
-        		buildUnit(rc, RobotType.BARRACKS);
-    		else
-    			mineOrMove(rc);
-    	else if(Clock.getRoundNum()<1600)
-    		mineOrMove(rc);
-    	else
-    		chargeHQ(rc);
+//    	if(Clock.getRoundNum()<200)
+//    		mineOrMove(rc);
+//    	else if(Clock.getRoundNum()<300)
+//    		if(rc.getTeamOre()>500)
+//    			buildUnit(rc, RobotType.MINERFACTORY);
+//    		else
+//    			mineOrMove(rc);
+//    	else if(Clock.getRoundNum()<400)
+//    		mineOrMove(rc);
+//    	else if(Clock.getRoundNum()<500)
+//    		if(rc.getTeamOre()>300)
+//        		buildUnit(rc, RobotType.BARRACKS);
+//    		else
+//    			mineOrMove(rc);
+//    	else if(Clock.getRoundNum()<600)
+//    		mineOrMove(rc);
+//    	else if(Clock.getRoundNum()<700)
+//    		if(rc.getTeamOre()>200)
+//        		buildUnit(rc, RobotType.MINERFACTORY);
+//    		else
+//    			mineOrMove(rc);
+//    	else if(Clock.getRoundNum()<1000)
+//    		if(rc.getTeamOre()>300)
+//        		buildUnit(rc, RobotType.BARRACKS);
+//    		else
+//    			mineOrMove(rc);
+//    	else if(Clock.getRoundNum()<1600)
+//    		mineOrMove(rc);
+//    	else
+//    		chargeHQ(rc);
     }
     
     

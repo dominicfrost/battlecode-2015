@@ -14,10 +14,10 @@ public class HQ {
 		RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
 
 		assessTheSituation();
-		//if(first){
+		if(first){
 			setPointsOfInterest(5);
-		//	first = false;
-		//}
+			first = false;
+		}
 
 		if (rc.isCoreReady()) {
 			if (!Util.attack(rc, enemyRobots)) {
@@ -56,10 +56,10 @@ public class HQ {
 		}
 
 		// how close we want the point to be to enemy location relative to map size
-		double pointProximity = 1.0 / 4.0;
+		double pointProximity = (75.0 / 100.0);
 		// Corner Locations
 		double xCornerX = (myHq.add(xDir, Math.abs((distX))).x);
-		double xCornerY = (myHq.add(yDir, (int)(Math.abs(distY) * pointProximity))).y; 
+		double xCornerY = (myHq.add(yDir, (int)(Math.abs(distY) * pointProximity))).y;
 
 		double yCornerX = (myHq.add(xDir, (int)(Math.abs(distX) * pointProximity))).x;
 		double yCornerY = (myHq.add(yDir, Math.abs((distY))).y);
@@ -73,7 +73,7 @@ public class HQ {
 
 		int finalXLine = (int)Math.sqrt(yCorner.distanceSquaredTo(enemyHq));
 		int finalYLine = (int)Math.sqrt(xCorner.distanceSquaredTo(enemyHq));
-		
+
 		double jumpSize = (1 / ((double)numPoints - 1));
 
 		for (int i = 1; i < numPoints - 1; i++){
@@ -87,12 +87,6 @@ public class HQ {
 		for (int i = 0; i < numPoints; i++){
 			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (2 * i), pointsOfInterest[i].x);
 			rc.broadcast(MyConstants.POINTS_OF_INTEREST_OFFSET + (2 * i + 1), pointsOfInterest[i].y);
-		}
-		
-		for(int i = 0; i < numPoints; i++){
-			int x = pointsOfInterest[i].x;
-			int y = pointsOfInterest[i].y;
-			System.out.println("I: " + i + " X: " + x + " Y: " + y);
 		}
 	}
 
@@ -130,8 +124,8 @@ public class HQ {
 				// TODO: this may change when we figure out how much supply drones
 				// are actually using and how much we have to offer
 				maxRobotSupply = Math.min(4000, (2000 - Clock.getRoundNum()) * 5);
-			typeCount[RobotType.DRONE.ordinal()]++;
-			break;
+				typeCount[RobotType.DRONE.ordinal()]++;
+				break;
 			case HANDWASHSTATION:
 				typeCount[RobotType.HANDWASHSTATION.ordinal()]++;
 				break;
@@ -260,5 +254,5 @@ public class HQ {
 		rc.broadcast(MyConstants.ATTACK_LOCATION, closest.x);
 		rc.broadcast(MyConstants.ATTACK_LOCATION + 1, closest.y);
 	}
-	
+
 }
