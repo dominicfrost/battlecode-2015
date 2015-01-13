@@ -151,7 +151,7 @@ public class Pathing {
 
     public static boolean doMove(RobotController rc, Direction dir) throws GameActionException {
         if (rc.senseTerrainTile(rc.getLocation().add(dir)) == TerrainTile.OFF_MAP) return false;
-        //if (!rc.canMove(dir)) return false;
+        if (!rc.canMove(dir)) return false;
 
         while (!rc.isCoreReady()) {
             rc.yield();
