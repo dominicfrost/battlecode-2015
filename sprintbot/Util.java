@@ -73,11 +73,11 @@ public class Util {
 		}
 	}
 
-	public static int mapLocToInt(MapLocation m){
+	public static int mapLocToInt(MapLocation m)  throws GameActionException{
 		return (m.x*10000 + m.y);
 	}
 
-	public static MapLocation intToMapLoc(int i){
+	public static MapLocation intToMapLoc(int i)  throws GameActionException{
 		return new MapLocation(i/10000,i%10000);
 	}
 
@@ -115,7 +115,7 @@ public class Util {
 
 	}
 
-	public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation) {
+	public static boolean safeToMoveTo(RobotController rc, MapLocation myLocation) throws GameActionException {
 		MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
 		MapLocation enemyHQ = rc.senseEnemyHQLocation();
 
@@ -180,7 +180,7 @@ public class Util {
 	}
 
 	//use this to return the map location in a specific direction from your robot
-	public static MapLocation getAdjacentLocation(RobotController rc, Direction dir, MapLocation loc){
+	public static MapLocation getAdjacentLocation(RobotController rc, Direction dir, MapLocation loc) throws GameActionException {
 		return (loc.add(dir));
 	}
 
@@ -256,7 +256,7 @@ public class Util {
 		}
 	}
 
-	public static Direction intToDirection(int i) {
+	public static Direction intToDirection(int i)  throws GameActionException {
 		switch(i) {
 		case 0:
 			return Direction.NORTH;
@@ -279,7 +279,7 @@ public class Util {
 		}
 	}
 
-	public static int directionToInt(Direction d) {
+	public static int directionToInt(Direction d)  throws GameActionException {
 		switch(d) {
 		case NORTH:
 			return 0;
@@ -380,7 +380,7 @@ public class Util {
 		}
 		return false;
 	}
-	public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) {
+	public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) throws GameActionException {
 		Direction dirToGoal;
 		ArrayList<MapLocation> mLine = new ArrayList<MapLocation>();
 		MapLocation previousLocation = rc.getLocation();
@@ -425,7 +425,7 @@ public class Util {
 	// Assign a value to all surrounding squares. The square with the lowest value is returned, directions towards
 	// enemy HQ are given preference. Square value = (2 * damage going to take next turn in that square) - (damage 
 	// robot can inflict). 
-	private static Direction kiteDirection(RobotController rc, MapLocation baseSquare, RobotInfo[] enemiesInSight) {
+	private static Direction kiteDirection(RobotController rc, MapLocation baseSquare, RobotInfo[] enemiesInSight)  throws GameActionException{
 		Direction dirToMove = null;
 		int myRange = rc.getType().attackRadiusSquared;
 		double[] squareValues = new double[8];
@@ -508,7 +508,7 @@ public class Util {
 		}
 	}
 
-	public static void debug(RobotController rc, String msg) {
+	public static void debug(RobotController rc, String msg) throws GameActionException {
 		if (rc.getID() == 34293) {
 			System.out.println("DEBUG: " + msg);
 		}

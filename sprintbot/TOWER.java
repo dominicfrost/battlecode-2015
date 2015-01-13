@@ -8,6 +8,7 @@ public class TOWER {
     public static boolean first = true;
 
     public static void execute(RobotController rc_in) throws GameActionException {
+        rc = rc_in;
         if (first) {
             first = false;
             int ordinal = getTowerOrdinal();
@@ -15,7 +16,7 @@ public class TOWER {
             rc.broadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + ordinal, location.x);
             rc.broadcast(MyConstants.TOWER_UNDER_DISTRESS_LOCATION + ordinal + 1, location.y);
         }
-        rc = rc_in;
+
         RobotInfo[] enemyRobots = rc.senseNearbyRobots(999999, RobotPlayer.enemyTeam);
         double currHealth = rc.getHealth();
         if (currHealth < prevHealth) {

@@ -109,7 +109,7 @@ public class Pathing {
         }
     }
 
-    public static Direction rotateInDir(Direction startDir, boolean rotateLeft) {
+    public static Direction rotateInDir(Direction startDir, boolean rotateLeft) throws GameActionException {
         if (rotateLeft) {
             return startDir.rotateLeft();
         } else {
@@ -162,7 +162,7 @@ public class Pathing {
         return false;
     }
 
-    public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) {
+    public static ArrayList<MapLocation> calcMLine(RobotController rc, MapLocation goal) throws GameActionException {
         Direction dirToGoal;
         ArrayList<MapLocation> mLine = new ArrayList<MapLocation>();
         MapLocation currentLocation = rc.getLocation();
