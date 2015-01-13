@@ -3,12 +3,12 @@ package sprintbot;
 import battlecode.common.*;
 
 public class MISSLE {
-    public static boolean first = false;
+    public static boolean first = true;
     public static MapLocation toAttack = null;
 
     public static void execute(RobotController rc) throws GameActionException {
         MapLocation myLocation = rc.getLocation();
-        if (!first) {
+        if (first) {
             RobotInfo[] enemiesInRange = rc.senseNearbyRobots(24, RobotPlayer.enemyTeam);
             double max_hit_count = Integer.MIN_VALUE;
 
@@ -33,7 +33,7 @@ public class MISSLE {
                 toAttack = myLocation.add(Direction.NORTH, 5);
             }
 
-            first = true;
+            first = false;
         }
 
         if (myLocation.equals(toAttack)) {
